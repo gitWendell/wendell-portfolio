@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wendell B. Casul — AI Engineer</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #080B10;
+      --surface:   #0D1117;
+      --border:    #1C2333;
+      --cyan:      #00F5D4;
+      --amber:     #F7B731;
+      --red:       #FF4C6A;
+      --muted:     #3A4556;
+      --dim:       #8A9BB0;
+      --text:      #D4E0EE;
+      --white:     #FFFFFF;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Inter', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ─── TOP BAR ─────────────────────────────────────── */
+    #topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #FF5F57; }
+    .dot-y { background: #FFBD2E; }
+    .dot-g { background: #28C840; }
+    #topbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    #topbar-title span { color: var(--cyan); }
+    .status-badge {
+      font-size: 10px;
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+      padding: 2px 8px;
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* ─── LAYOUT ──────────────────────────────────────── */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100vh - 41px);
+    }
+
+    /* ─── LEFT SIDEBAR ────────────────────────────────── */
+    #sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: var(--surface);
+      overflow-y: auto;
+    }
+    .side-section {
+      padding: 6px 16px 2px;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .side-cmd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      font-size: 11px;
+      color: var(--dim);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+    }
+    .side-cmd:hover, .side-cmd.active {
+      color: var(--cyan);
+      background: rgba(0,245,212,0.06);
+      border-left-color: var(--cyan);
+    }
+    .side-cmd .icon { font-size: 12px; width: 16px; flex-shrink: 0; }
+    .side-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 16px;
+    }
+    #avatar-wrap {
+      padding: 16px;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+    #avatar-card {
+      background: rgba(0,245,212,0.05);
+      border: 1px solid rgba(0,245,212,0.2);
+      border-radius: 4px;
+      padding: 12px;
+    }
+    #avatar-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.06em;
+    }
+    #avatar-role {
+      font-size: 9px;
+      color: var(--dim);
+      margin-top: 2px;
+      letter-spacing: 0.08em;
+    }
+    #avatar-loc {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ─── TERMINAL ────────────────────────────────────── */
+    #terminal {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* scanline overlay */
+    #terminal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      scroll-behavior: smooth;
+    }
+    #output::-webkit-scrollbar { width: 4px; }
+    #output::-webkit-scrollbar-track { background: transparent; }
+    #output::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+    /* ─── MESSAGE BLOCKS ──────────────────────────────── */
+    .msg-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 16px;
+      animation: fadeSlide 0.25s ease forwards;
+    }
+    @keyframes fadeSlide {
+      from { opacity:0; transform: translateY(6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .msg-meta .tag {
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+    .tag-user { background: rgba(247,183,49,0.15); color: var(--amber); border: 1px solid rgba(247,183,49,0.3); }
+    .tag-ai   { background: rgba(0,245,212,0.1);  color: var(--cyan); border: 1px solid rgba(0,245,212,0.3); }
+    .tag-sys  { background: rgba(138,155,176,0.1); color: var(--dim); border: 1px solid rgba(138,155,176,0.2); }
+
+    .msg-body {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      padding-left: 2px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg-body.user-body { color: var(--amber); }
+    .msg-body.sys-body  { color: var(--dim); font-size: 11px; }
+
+    /* inline formatting */
+    .msg-body strong { color: var(--cyan); font-weight: 600; }
+    .msg-body em     { color: var(--amber); font-style: normal; }
+    .msg-body code {
+      background: rgba(0,245,212,0.08);
+      border: 1px solid rgba(0,245,212,0.2);
+      padding: 1px 5px;
+      border-radius: 2px;
+      font-size: 11px;
+      color: var(--cyan);
+    }
+
+    /* ─── QUICK PROMPTS ───────────────────────────────── */
+    #quick-wrap {
+      padding: 10px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: var(--surface);
+    }
+    .quick-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; width: 100%; }
+    .qbtn {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      background: transparent;
+      padding: 5px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.04em;
+    }
+    .qbtn:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: rgba(0,245,212,0.05);
+    }
+
+    /* ─── INPUT BAR ───────────────────────────────────── */
+    #input-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    #prompt-sym {
+      color: var(--cyan);
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    #input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--amber);
+      caret-color: var(--cyan);
+    }
+    #input::placeholder { color: var(--muted); }
+    #send-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--cyan);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    #send-btn:hover { opacity: 0.85; }
+    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ─── RIGHT PANEL ─────────────────────────────────── */
+    #right-panel {
+      width: 200px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      padding: 16px 0;
+      background: var(--surface);
+      overflow-y: auto;
+    }
+    .rp-title {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0 14px 8px;
+    }
+    .skill-row {
+      padding: 6px 14px;
+      font-size: 10px;
+      color: var(--dim);
+    }
+    .skill-bar-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .skill-bar {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--cyan);
+    }
+    .rp-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 14px;
+    }
+    .tag-pill {
+      display: inline-block;
+      margin: 2px 3px 2px 14px;
+      font-size: 9px;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+    }
+    .tag-pill.hot {
+      color: var(--cyan);
+      border-color: rgba(0,245,212,0.3);
+      background: rgba(0,245,212,0.05);
+    }
+    .exp-badge {
+      margin: 6px 14px;
+      font-size: 10px;
+      color: var(--amber);
+    }
+
+    /* loading dots */
+    .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+    .loading-dots span {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: dotBounce 1.2s ease-in-out infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotBounce {
+      0%,80%,100% { transform: scale(0.6); opacity:0.4; }
+      40% { transform: scale(1); opacity:1; }
+    }
+
+    @media (max-width: 700px) {
+      #sidebar { display: none; }
+      #right-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="dot dot-r"></div>
+  <div class="dot dot-y"></div>
+  <div class="dot dot-g"></div>
+  <div id="topbar-title">wendell.casul — <span>ai engineer</span> / portfolio-v1.0</div>
+  <div class="status-badge">● LIVE</div>
+</div>
+
+<div id="main">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="side-section">Navigate</div>
+    <div class="side-cmd active" onclick="sendQuick('Introduce yourself, Wendell.')">
+      <span class="icon">⚡</span> Overview
+    </div>
+    <div class="side-cmd" onclick="sendQuick('Tell me about your work experience in detail.')">
+      <span class="icon">🗂</span> Experience
+    </div>
+    <div class="side-cmd" onclick="sendQuick('What projects have you built?')">
+      <span class="icon">🚀</span> Projects
+    </div>
+    <div class="side-cmd" onclick="sendQuick('What are your technical skills and stack?')">
+      <span class="icon">🔧</span> Stack
+    </div>
+    <div class="side-cmd" onclick="sendQuick('How do you use AI in your development workflow?')">
+      <span class="icon">🤖</span> AI Workflow
+    </div>
+    <div class="side-cmd" onclick="sendQuick('What kind of role or opportunity are you looking for?')">
+      <span class="icon">🎯</span> Open To
+    </div>
+    <div class="side-divider"></div>
+    <div class="side-section">Ask Anything</div>
+    <div class="side-cmd" onclick="sendQuick('What makes you different from other developers?')">
+      <span class="icon">✦</span> Why Wendell
+    </div>
+    <div class="side-cmd" onclick="sendQuick('What is Spec-Driven Development and how do you use it?')">
+      <span class="icon">📐</span> SDD Method
+    </div>
+    <div class="side-cmd" onclick="sendQuick('How can I contact you?')">
+      <span class="icon">📡</span> Contact
+    </div>
+    <div id="avatar-wrap">
+      <div id="avatar-card">
+        <div id="avatar-name">Wendell B. Casul</div>
+        <div id="avatar-role">AI Engineer · Full-Stack</div>
+        <div id="avatar-loc">📍 Cebu City, PH</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div id="terminal">
+    <div id="output"></div>
+
+    <div id="quick-wrap">
+      <div class="quick-label">Quick Prompts →</div>
+      <button class="qbtn" onclick="sendQuick('Introduce yourself, Wendell.')">⚡ intro</button>
+      <button class="qbtn" onclick="sendQuick('What projects have you built?')">🚀 projects</button>
+      <button class="qbtn" onclick="sendQuick('What are your technical skills and stack?')">🔧 stack</button>
+      <button class="qbtn" onclick="sendQuick('How do you use AI in your workflow?')">🤖 ai workflow</button>
+      <button class="qbtn" onclick="sendQuick('What makes you different from other developers?')">✦ why me</button>
+      <button class="qbtn" onclick="sendQuick('How can I contact you?')">📡 contact</button>
+    </div>
+
+    <div id="input-bar">
+      <span id="prompt-sym">›_</span>
+      <input
+        id="input"
+        type="text"
+        placeholder="Ask Wendell anything... (press Enter)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="send-btn" onclick="handleSend()">SEND ↵</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="rp-title">Skills Index</div>
+    <div class="skill-row">
+      AI / LLM Integration
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div>
+    </div>
+    <div class="skill-row">
+      React · TypeScript
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div>
+    </div>
+    <div class="skill-row">
+      PHP · Laravel
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div>
+    </div>
+    <div class="skill-row">
+      Node.js · APIs
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div>
+    </div>
+    <div class="skill-row">
+      Docker · AWS
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div>
+    </div>
+    <div class="skill-row">
+      Prompt Engineering
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div>
+    </div>
+    <div class="rp-divider"></div>
+    <div class="rp-title">Tools</div>
+    <span class="tag-pill hot">Claude</span>
+    <span class="tag-pill hot">Cursor IDE</span>
+    <span class="tag-pill hot">SpecKit</span>
+    <span class="tag-pill">ChatGPT</span>
+    <span class="tag-pill">Grok</span>
+    <span class="tag-pill">Docker</span>
+    <span class="tag-pill">AWS</span>
+    <span class="tag-pill">WebSockets</span>
+    <div class="rp-divider"></div>
+    <div class="rp-title">Experience</div>
+    <div class="exp-badge">5+ years</div>
+    <div class="skill-row" style="font-size:10px;color:var(--dim)">
+      Forty Degree Celsius Inc.<br/>
+      <span style="color:var(--muted);font-size:9px">Jul 2023 – Present</span>
+    </div>
+    <div class="skill-row" style="font-size:10px;color:var(--dim)">
+      Maple Muramoto PH Inc.<br/>
+      <span style="color:var(--muted);font-size:9px">Jun 2021 – Jul 2023</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const conversationHistory = [];
+  const output = document.getElementById('output');
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('send-btn');
+
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code>$1</code>');
+  }
+
+  function appendMessage(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-wrap';
+
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    if (role === 'user') {
+      meta.innerHTML = `<span class="tag tag-user">YOU</span><span>${timeStr}</span>`;
+      const body = document.createElement('div');
+      body.className = 'msg-body user-body';
+      body.textContent = text;
+      wrap.appendChild(meta);
+      wrap.appendChild(body);
+    } else if (role === 'system') {
+      meta.innerHTML = `<span class="tag tag-sys">SYS</span><span>${timeStr}</span>`;
+      const body = document.createElement('div');
+      body.className = 'msg-body sys-body';
+      body.textContent = text;
+      wrap.appendChild(meta);
+      wrap.appendChild(body);
+    } else {
+      meta.innerHTML = `<span class="tag tag-ai">WENDELL</span><span>${timeStr}</span>`;
+      const body = document.createElement('div');
+      body.className = 'msg-body';
+      body.innerHTML = formatText(text);
+      wrap.appendChild(meta);
+      wrap.appendChild(body);
+    }
+
+    output.appendChild(wrap);
+    output.scrollTop = output.scrollHeight;
+    return wrap;
+  }
+
+  function appendLoading() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-wrap';
+    wrap.id = 'loading-msg';
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.innerHTML = `<span class="tag tag-ai">WENDELL</span>`;
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    body.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+    wrap.appendChild(meta);
+    wrap.appendChild(body);
+    output.appendChild(wrap);
+    output.scrollTop = output.scrollHeight;
+    return wrap;
+  }
+
+  async function sendMessage(userText) {
+    if (!userText.trim()) return;
+
+    sendBtn.disabled = true;
+    input.disabled = true;
+
+    appendMessage('user', userText);
+    conversationHistory.push({ role: 'user', content: userText });
+
+    const loadingEl = appendLoading();
+
+    try {
+      // Calls YOUR server at /api/chat — the API key lives there, not here
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory })
+      });
+
+      const data = await response.json();
+      loadingEl.remove();
+
+      if (data.content && data.content[0]) {
+        const aiText = data.content[0].text;
+        appendMessage('ai', aiText);
+        conversationHistory.push({ role: 'assistant', content: aiText });
+      } else {
+        appendMessage('system', `Error: ${data.error || 'Unknown error. Please try again.'}`);
+      }
+    } catch (err) {
+      loadingEl.remove();
+      appendMessage('system', 'Network error — make sure the server is running.');
+    }
+
+    sendBtn.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
+
+  function handleSend() {
+    const val = input.value.trim();
+    if (!val) return;
+    input.value = '';
+    sendMessage(val);
+  }
+
+  function sendQuick(text) {
+    input.value = text;
+    handleSend();
+    document.querySelectorAll('.side-cmd').forEach(el => el.classList.remove('active'));
+  }
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  function boot() {
+    const lines = [
+      '> Initializing wendell.portfolio v1.0...',
+      '> Loading AI context engine — OK',
+      '> Mounting knowledge base: resume, skills, projects — OK',
+      '> Connection established. Ask me anything.',
+    ];
+    let i = 0;
+    function nextLine() {
+      if (i < lines.length) {
+        appendMessage('system', lines[i++]);
+        setTimeout(nextLine, 400);
+      } else {
+        setTimeout(() => {
+          sendMessage('Introduce yourself, Wendell. Give me a compelling, personal pitch.');
+        }, 500);
+      }
+    }
+    nextLine();
+  }
+
+  boot();
+</script>
+</body>
+</html>
