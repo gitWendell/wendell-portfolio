@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wendell B. Casul — AI Engineer</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <style>
       :root {
         --bg: #080b10;
@@ -21,543 +18,203 @@
         --mono: "JetBrains Mono", monospace;
         --topbar-h: 41px;
       }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        height: 100%;
-        overflow: hidden;
-        background: var(--bg);
-        color: var(--text);
-        font-family: var(--mono);
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--mono); }
 
       /* ─── TOP BAR ─────────────────────────────────────── */
       #topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: var(--topbar-h);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0 20px;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        z-index: 100;
+        position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h);
+        display: flex; align-items: center; gap: 12px; padding: 0 20px;
+        background: var(--surface); border-bottom: 1px solid var(--border); z-index: 100;
       }
-      .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-      }
-      .dot-r {
-        background: #ff5f57;
-      }
-      .dot-y {
-        background: #ffbd2e;
-      }
-      .dot-g {
-        background: #28c840;
-      }
-      #topbar-title {
-        flex: 1;
-        text-align: center;
-        font-size: 11px;
-        color: var(--dim);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-      #topbar-title span {
-        color: var(--cyan);
-      }
-      .status-badge {
-        font-size: 10px;
-        color: var(--cyan);
-        border: 1px solid var(--cyan);
-        padding: 2px 8px;
-        border-radius: 2px;
-        letter-spacing: 0.08em;
-        animation: pulse 2s ease-in-out infinite;
-      }
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
+      .dot { width: 12px; height: 12px; border-radius: 50%; }
+      .dot-r { background: #ff5f57; } .dot-y { background: #ffbd2e; } .dot-g { background: #28c840; }
+      #topbar-title { flex: 1; text-align: center; font-size: 11px; color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase; }
+      #topbar-title span { color: var(--cyan); }
+      .status-badge { font-size: 10px; color: var(--cyan); border: 1px solid var(--cyan); padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; animation: pulse 2s ease-in-out infinite; }
+      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
       /* ─── LAYOUT ──────────────────────────────────────── */
-      #main {
-        position: fixed;
-        top: var(--topbar-h);
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        overflow: hidden;
-      }
+      #main { position: fixed; top: var(--topbar-h); left: 0; right: 0; bottom: 0; display: flex; overflow: hidden; }
 
       /* ─── SIDEBAR ─────────────────────────────────────── */
       #sidebar {
-        width: 200px;
-        flex-shrink: 0;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        border-right: 1px solid var(--border);
-        background: var(--surface);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 20px 0;
+        width: 200px; flex-shrink: 0; height: 100%; overflow-y: auto; overflow-x: hidden;
+        border-right: 1px solid var(--border); background: var(--surface);
+        display: flex; flex-direction: column; gap: 4px; padding: 20px 0;
       }
-      #sidebar::-webkit-scrollbar {
-        width: 4px;
-      }
-      #sidebar::-webkit-scrollbar-thumb {
-        background: var(--muted);
-        border-radius: 2px;
-      }
-      .side-section {
-        padding: 6px 16px 2px;
-        font-size: 9px;
-        color: var(--muted);
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        flex-shrink: 0;
-      }
-      .side-cmd {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 16px;
-        font-size: 11px;
-        color: var(--dim);
-        cursor: pointer;
-        transition: all 0.15s;
-        border-left: 2px solid transparent;
-        flex-shrink: 0;
-      }
-      .side-cmd:hover,
-      .side-cmd.active {
-        color: var(--cyan);
-        background: rgba(0, 245, 212, 0.06);
-        border-left-color: var(--cyan);
-      }
-      .side-cmd .icon {
-        font-size: 12px;
-        width: 16px;
-        flex-shrink: 0;
-      }
-      .side-divider {
-        height: 1px;
-        background: var(--border);
-        margin: 8px 16px;
-        flex-shrink: 0;
-      }
-      #avatar-wrap {
-        padding: 16px;
-        margin-top: auto;
-        border-top: 1px solid var(--border);
-        flex-shrink: 0;
-      }
-      #avatar-card {
-        background: rgba(0, 245, 212, 0.05);
-        border: 1px solid rgba(0, 245, 212, 0.2);
-        border-radius: 4px;
-        padding: 12px;
-      }
-      #avatar-name {
-        font-size: 11px;
-        font-weight: 700;
-        color: var(--cyan);
-        letter-spacing: 0.06em;
-      }
-      #avatar-role {
-        font-size: 9px;
-        color: var(--dim);
-        margin-top: 2px;
-        letter-spacing: 0.08em;
-      }
-      #avatar-loc {
-        font-size: 9px;
-        color: var(--muted);
-        margin-top: 6px;
-      }
+      #sidebar::-webkit-scrollbar { width: 4px; }
+      #sidebar::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+      .side-section { padding: 6px 16px 2px; font-size: 9px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; flex-shrink: 0; }
+      .side-cmd { display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-size: 11px; color: var(--dim); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; flex-shrink: 0; }
+      .side-cmd:hover, .side-cmd.active { color: var(--cyan); background: rgba(0,245,212,0.06); border-left-color: var(--cyan); }
+      .side-cmd .icon { font-size: 12px; width: 16px; flex-shrink: 0; }
+      .side-divider { height: 1px; background: var(--border); margin: 8px 16px; flex-shrink: 0; }
+      #avatar-wrap { padding: 16px; margin-top: auto; border-top: 1px solid var(--border); flex-shrink: 0; }
+      #avatar-card { background: rgba(0,245,212,0.05); border: 1px solid rgba(0,245,212,0.2); border-radius: 4px; padding: 12px; }
+      #avatar-name { font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.06em; }
+      #avatar-role { font-size: 9px; color: var(--dim); margin-top: 2px; letter-spacing: 0.08em; }
+      #avatar-loc  { font-size: 9px; color: var(--muted); margin-top: 6px; }
 
       /* ─── TERMINAL ────────────────────────────────────── */
-      #terminal {
-        flex: 1;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-      }
+      #terminal { flex: 1; height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; }
       #terminal::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 10;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(0, 0, 0, 0.06) 2px,
-          rgba(0, 0, 0, 0.06) 4px
-        );
+        content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 10;
+        background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
       }
-      #output {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 20px 24px;
-        scroll-behavior: smooth;
-      }
-      #output::-webkit-scrollbar {
-        width: 8px;
-      }
-      #output::-webkit-scrollbar-track {
-        background: var(--surface);
-        border-left: 1px solid var(--border);
-      }
-      #output::-webkit-scrollbar-thumb {
-        background: var(--muted);
-        border-radius: 2px;
-        border: 2px solid var(--surface);
-      }
-      #output::-webkit-scrollbar-thumb:hover {
-        background: var(--cyan);
-      }
+      #output { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px 24px; scroll-behavior: smooth; }
+      #output::-webkit-scrollbar { width: 8px; }
+      #output::-webkit-scrollbar-track { background: var(--surface); border-left: 1px solid var(--border); }
+      #output::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; border: 2px solid var(--surface); }
+      #output::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
 
       /* ─── MESSAGES ────────────────────────────────────── */
-      .msg-wrap {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-bottom: 20px;
-        animation: fadeSlide 0.25s ease forwards;
-      }
-      @keyframes fadeSlide {
-        from {
-          opacity: 0;
-          transform: translateY(6px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .msg-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 9px;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-      }
-      .msg-meta .tag {
-        padding: 1px 6px;
-        border-radius: 2px;
-        font-weight: 700;
-      }
-      .tag-user {
-        background: rgba(247, 183, 49, 0.15);
-        color: var(--amber);
-        border: 1px solid rgba(247, 183, 49, 0.3);
-      }
-      .tag-ai {
-        background: rgba(0, 245, 212, 0.1);
-        color: var(--cyan);
-        border: 1px solid rgba(0, 245, 212, 0.3);
-      }
-      .tag-sys {
-        background: rgba(138, 155, 176, 0.1);
-        color: var(--dim);
-        border: 1px solid rgba(138, 155, 176, 0.2);
-      }
-      .msg-body {
-        font-size: 13px;
-        line-height: 1.8;
-        color: var(--text);
-        padding-left: 2px;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .msg-body.user-body {
-        color: var(--amber);
-      }
-      .msg-body.sys-body {
-        color: var(--dim);
-        font-size: 11px;
-      }
-      .msg-body strong {
-        color: var(--cyan);
-        font-weight: 600;
-      }
-      .msg-body em {
-        color: var(--amber);
-        font-style: normal;
-      }
-      .msg-body code {
-        background: rgba(0, 245, 212, 0.08);
-        border: 1px solid rgba(0, 245, 212, 0.2);
-        padding: 1px 5px;
-        border-radius: 2px;
-        font-size: 11px;
-        color: var(--cyan);
-      }
+      .msg-wrap { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; animation: fadeSlide 0.25s ease forwards; }
+      @keyframes fadeSlide { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+      .msg-meta { display: flex; align-items: center; gap: 8px; font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+      .msg-meta .tag { padding: 1px 6px; border-radius: 2px; font-weight: 700; }
+      .tag-user { background: rgba(247,183,49,0.15); color: var(--amber); border: 1px solid rgba(247,183,49,0.3); }
+      .tag-ai   { background: rgba(0,245,212,0.1);  color: var(--cyan);  border: 1px solid rgba(0,245,212,0.3); }
+      .tag-sys  { background: rgba(138,155,176,0.1); color: var(--dim);  border: 1px solid rgba(138,155,176,0.2); }
+      .msg-body { font-size: 13px; line-height: 1.8; color: var(--text); padding-left: 2px; white-space: pre-wrap; word-break: break-word; }
+      .msg-body.user-body { color: var(--amber); }
+      .msg-body.sys-body  { color: var(--dim); font-size: 11px; }
+      .msg-body strong { color: var(--cyan); font-weight: 600; }
+      .msg-body em     { color: var(--amber); font-style: normal; }
+      .msg-body code   { background: rgba(0,245,212,0.08); border: 1px solid rgba(0,245,212,0.2); padding: 1px 5px; border-radius: 2px; font-size: 11px; color: var(--cyan); }
 
-      /* ─── TECH BADGE STRIP ────────────────────────────── */
-      .badge-strip {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 12px;
-        padding: 12px 14px;
-        background: rgba(0, 245, 212, 0.03);
-        border: 1px solid rgba(0, 245, 212, 0.1);
-        border-radius: 4px;
-      }
-      .badge-strip-label {
-        width: 100%;
-        font-size: 9px;
-        color: var(--muted);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-      }
-      .tech-badge {
-        display: flex;
+      /* ─── INLINE TECH ICONS ──────────────────────────── */
+      .tech-inline {
+        display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid var(--border);
-        border-radius: 3px;
-        font-size: 10px;
-        color: var(--dim);
-        letter-spacing: 0.04em;
-        transition: all 0.15s;
+        gap: 3px;
+        vertical-align: middle;
+        white-space: nowrap;
       }
-      .tech-badge:hover {
-        border-color: var(--cyan);
-        color: var(--cyan);
-        background: rgba(0, 245, 212, 0.06);
-      }
-      .tech-badge img {
-        width: 16px;
-        height: 16px;
+      .tech-inline img {
+        width: 14px;
+        height: 14px;
         object-fit: contain;
+        vertical-align: middle;
         border-radius: 2px;
-        filter: brightness(0.9);
+        position: relative;
+        top: -1px;
       }
 
       /* ─── QUICK PROMPTS ───────────────────────────────── */
-      #quick-wrap {
-        flex-shrink: 0;
-        padding: 10px 24px;
-        border-top: 1px solid var(--border);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        background: var(--surface);
-      }
-      .quick-label {
-        font-size: 9px;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        width: 100%;
-      }
-      .qbtn {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--dim);
-        border: 1px solid var(--border);
-        background: transparent;
-        padding: 5px 10px;
-        border-radius: 2px;
-        cursor: pointer;
-        transition: all 0.15s;
-        letter-spacing: 0.04em;
-      }
-      .qbtn:hover {
-        color: var(--cyan);
-        border-color: var(--cyan);
-        background: rgba(0, 245, 212, 0.05);
-      }
+      #quick-wrap { flex-shrink: 0; padding: 10px 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface); }
+      .quick-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; width: 100%; }
+      .qbtn { font-family: var(--mono); font-size: 10px; color: var(--dim); border: 1px solid var(--border); background: transparent; padding: 5px 10px; border-radius: 2px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; }
+      .qbtn:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(0,245,212,0.05); }
 
       /* ─── INPUT BAR ───────────────────────────────────── */
-      #input-bar {
-        flex-shrink: 0;
+      #input-bar { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-top: 1px solid var(--border); background: var(--bg); }
+      #prompt-sym { color: var(--cyan); font-size: 14px; font-weight: 700; flex-shrink: 0; user-select: none; }
+      #input { flex: 1; background: transparent; border: none; outline: none; font-family: var(--mono); font-size: 13px; color: var(--amber); caret-color: var(--cyan); }
+      #input::placeholder { color: var(--muted); }
+      #send-btn { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--bg); background: var(--cyan); border: none; padding: 6px 14px; border-radius: 2px; cursor: pointer; letter-spacing: 0.06em; transition: opacity 0.15s; flex-shrink: 0; }
+      #send-btn:hover { opacity: 0.85; }
+      #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+      /* ─── RIGHT PANEL ─────────────────────────────────── */
+      #right-panel { width: 200px; flex-shrink: 0; height: 100%; overflow-y: auto; overflow-x: hidden; border-left: 1px solid var(--border); background: var(--surface); padding: 16px 0; }
+      #right-panel::-webkit-scrollbar { width: 4px; }
+      #right-panel::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+      .rp-title { font-size: 9px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; padding: 0 14px 8px; }
+      .skill-row { padding: 6px 14px; font-size: 10px; color: var(--dim); }
+      .skill-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+      .skill-bar { height: 100%; border-radius: 2px; background: var(--cyan); }
+      .rp-divider { height: 1px; background: var(--border); margin: 12px 14px; }
+      .tag-pill { display: inline-block; margin: 2px 3px 2px 14px; font-size: 9px; color: var(--dim); border: 1px solid var(--border); padding: 2px 6px; border-radius: 2px; letter-spacing: 0.06em; }
+      .tag-pill.hot { color: var(--cyan); border-color: rgba(0,245,212,0.3); background: rgba(0,245,212,0.05); }
+      .exp-badge { margin: 6px 14px; font-size: 10px; color: var(--amber); }
+
+      /* loading dots */
+      .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+      .loading-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); animation: dotBounce 1.2s ease-in-out infinite; }
+      .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+      .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes dotBounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+
+      /* ─── PROJECT CARDS ───────────────────────────────── */
+      .project-card {
+        display: flex;
+        flex-direction: column;
+        margin-top: 14px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.02);
+        transition: border-color 0.2s;
+        max-width: 480px;
+      }
+      .project-card:hover { border-color: var(--cyan); }
+      .project-card-thumb {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        object-position: top;
+        display: block;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .project-card-thumb-fallback {
+        width: 100%;
+        height: 160px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 12px 24px;
-        border-top: 1px solid var(--border);
-        background: var(--bg);
+        justify-content: center;
+        background: linear-gradient(135deg, #0d1117 0%, #1c2333 100%);
+        border-bottom: 1px solid var(--border);
+        font-size: 32px;
       }
-      #prompt-sym {
-        color: var(--cyan);
-        font-size: 14px;
+      .project-card-body { padding: 12px 14px; }
+      .project-card-title {
+        font-size: 12px;
         font-weight: 700;
-        flex-shrink: 0;
-        user-select: none;
+        color: var(--cyan);
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
       }
-      #input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        font-family: var(--mono);
-        font-size: 13px;
-        color: var(--amber);
-        caret-color: var(--cyan);
-      }
-      #input::placeholder {
-        color: var(--muted);
-      }
-      #send-btn {
-        font-family: var(--mono);
+      .project-card-desc {
         font-size: 11px;
+        color: var(--dim);
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+      .project-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+      .project-card-tag {
+        font-size: 9px;
+        color: var(--cyan);
+        border: 1px solid rgba(0,245,212,0.25);
+        background: rgba(0,245,212,0.06);
+        padding: 2px 7px;
+        border-radius: 2px;
+        letter-spacing: 0.06em;
+      }
+      .project-card-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
         font-weight: 700;
         color: var(--bg);
         background: var(--cyan);
-        border: none;
-        padding: 6px 14px;
+        padding: 5px 12px;
         border-radius: 2px;
-        cursor: pointer;
+        text-decoration: none;
         letter-spacing: 0.06em;
         transition: opacity 0.15s;
-        flex-shrink: 0;
       }
-      #send-btn:hover {
-        opacity: 0.85;
-      }
-      #send-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-
-      /* ─── RIGHT PANEL ─────────────────────────────────── */
-      #right-panel {
-        width: 200px;
-        flex-shrink: 0;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        border-left: 1px solid var(--border);
-        background: var(--surface);
-        padding: 16px 0;
-      }
-      #right-panel::-webkit-scrollbar {
-        width: 4px;
-      }
-      #right-panel::-webkit-scrollbar-thumb {
-        background: var(--muted);
-        border-radius: 2px;
-      }
-      .rp-title {
-        font-size: 9px;
-        color: var(--muted);
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        padding: 0 14px 8px;
-      }
-      .skill-row {
-        padding: 6px 14px;
-        font-size: 10px;
-        color: var(--dim);
-      }
-      .skill-bar-wrap {
-        height: 3px;
-        background: var(--border);
-        border-radius: 2px;
-        margin-top: 4px;
-        overflow: hidden;
-      }
-      .skill-bar {
-        height: 100%;
-        border-radius: 2px;
-        background: var(--cyan);
-      }
-      .rp-divider {
-        height: 1px;
-        background: var(--border);
-        margin: 12px 14px;
-      }
-      .tag-pill {
-        display: inline-block;
-        margin: 2px 3px 2px 14px;
-        font-size: 9px;
-        color: var(--dim);
-        border: 1px solid var(--border);
-        padding: 2px 6px;
-        border-radius: 2px;
-        letter-spacing: 0.06em;
-      }
-      .tag-pill.hot {
-        color: var(--cyan);
-        border-color: rgba(0, 245, 212, 0.3);
-        background: rgba(0, 245, 212, 0.05);
-      }
-      .exp-badge {
-        margin: 6px 14px;
-        font-size: 10px;
-        color: var(--amber);
-      }
-
-      /* loading dots */
-      .loading-dots {
-        display: inline-flex;
-        gap: 4px;
-        align-items: center;
-      }
-      .loading-dots span {
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: var(--cyan);
-        animation: dotBounce 1.2s ease-in-out infinite;
-      }
-      .loading-dots span:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .loading-dots span:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-      @keyframes dotBounce {
-        0%,
-        80%,
-        100% {
-          transform: scale(0.6);
-          opacity: 0.4;
-        }
-        40% {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-
-      @media (max-width: 700px) {
-        #sidebar {
-          display: none;
-        }
-        #right-panel {
-          display: none;
-        }
-      }
+      .project-card-link:hover { opacity: 0.85; }
+      .project-cards-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+      @media (max-width: 700px) { #sidebar { display: none; } #right-panel { display: none; } }
 
       /* ─── CRASH SCREEN ────────────────────────────────── */
       #crash-overlay {
@@ -571,43 +228,27 @@
         justify-content: center;
         overflow: hidden;
       }
-      #crash-overlay.active {
-        display: flex;
-      }
+      #crash-overlay.active { display: flex; }
 
       /* glitch canvas behind everything */
       #crash-canvas {
         position: absolute;
         inset: 0;
-        width: 100%;
-        height: 100%;
+        width: 100%; height: 100%;
         opacity: 0.18;
       }
 
       /* scanlines on crash */
       #crash-overlay::before {
-        content: "";
+        content: '';
         position: absolute;
         inset: 0;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(255, 0, 80, 0.07) 3px,
-          rgba(255, 0, 80, 0.07) 4px
-        );
+        background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,0,80,0.07) 3px, rgba(255,0,80,0.07) 4px);
         pointer-events: none;
         z-index: 1;
         animation: scanMove 8s linear infinite;
       }
-      @keyframes scanMove {
-        from {
-          background-position: 0 0;
-        }
-        to {
-          background-position: 0 100%;
-        }
-      }
+      @keyframes scanMove { from{background-position:0 0} to{background-position:0 100%} }
 
       #crash-content {
         position: relative;
@@ -615,18 +256,9 @@
         text-align: center;
         padding: 40px;
         max-width: 600px;
-        animation: crashIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation: crashIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
       }
-      @keyframes crashIn {
-        from {
-          opacity: 0;
-          transform: scale(1.08);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
+      @keyframes crashIn { from{opacity:0;transform:scale(1.08)} to{opacity:1;transform:scale(1)} }
 
       #crash-code {
         font-size: 11px;
@@ -637,23 +269,10 @@
         animation: glitchText 2s infinite;
       }
       @keyframes glitchText {
-        0%,
-        90%,
-        100% {
-          transform: none;
-          opacity: 1;
-        }
-        91% {
-          transform: skewX(-10deg) translateX(4px);
-          opacity: 0.8;
-        }
-        93% {
-          transform: skewX(6deg) translateX(-4px);
-          opacity: 0.9;
-        }
-        95% {
-          transform: none;
-        }
+        0%,90%,100% { transform: none; opacity: 1; }
+        91% { transform: skewX(-10deg) translateX(4px); opacity: 0.8; }
+        93% { transform: skewX(6deg)  translateX(-4px); opacity: 0.9; }
+        95% { transform: none; }
       }
 
       #crash-skull {
@@ -665,15 +284,8 @@
         animation: skullPulse 1.5s ease-in-out infinite;
       }
       @keyframes skullPulse {
-        0%,
-        100% {
-          filter: drop-shadow(0 0 20px #ff4c6a);
-          transform: scale(1);
-        }
-        50% {
-          filter: drop-shadow(0 0 40px #ff4c6a) drop-shadow(0 0 80px #ff4c6a88);
-          transform: scale(1.06);
-        }
+        0%,100% { filter: drop-shadow(0 0 20px #ff4c6a); transform: scale(1); }
+        50%      { filter: drop-shadow(0 0 40px #ff4c6a) drop-shadow(0 0 80px #ff4c6a88); transform: scale(1.06); }
       }
 
       #crash-title {
@@ -691,13 +303,11 @@
         line-height: 1.7;
         margin-bottom: 32px;
       }
-      #crash-sub span {
-        color: #00f5d4;
-      }
+      #crash-sub span { color: #00f5d4; }
 
       .crash-contact-box {
-        background: rgba(255, 76, 106, 0.07);
-        border: 1px solid rgba(255, 76, 106, 0.3);
+        background: rgba(255,76,106,0.07);
+        border: 1px solid rgba(255,76,106,0.3);
         border-radius: 4px;
         padding: 20px 28px;
         margin-bottom: 28px;
@@ -718,18 +328,9 @@
         align-items: center;
         gap: 10px;
       }
-      .crash-contact-box .cc-row span {
-        color: #8a9bb0;
-        width: 60px;
-        flex-shrink: 0;
-      }
-      .crash-contact-box a {
-        color: #00f5d4;
-        text-decoration: none;
-      }
-      .crash-contact-box a:hover {
-        text-decoration: underline;
-      }
+      .crash-contact-box .cc-row span { color: #8a9bb0; width: 60px; flex-shrink: 0; }
+      .crash-contact-box a { color: #00f5d4; text-decoration: none; }
+      .crash-contact-box a:hover { text-decoration: underline; }
 
       #crash-restart {
         font-family: "JetBrains Mono", monospace;
@@ -746,11 +347,7 @@
         transition: all 0.15s;
         box-shadow: 0 0 20px #ff4c6a66;
       }
-      #crash-restart:hover {
-        background: #fff;
-        color: #ff4c6a;
-        box-shadow: 0 0 30px #ff4c6aaa;
-      }
+      #crash-restart:hover { background: #fff; color: #ff4c6a; box-shadow: 0 0 30px #ff4c6aaa; }
 
       #crash-counter {
         font-size: 10px;
@@ -761,745 +358,546 @@
 
       /* warning flash before crash */
       @keyframes warningFlash {
-        0%,
-        100% {
-          background: transparent;
-        }
-        50% {
-          background: rgba(255, 76, 106, 0.08);
-        }
+        0%,100% { background: transparent; }
+        50% { background: rgba(255,76,106,0.08); }
       }
-      body.pre-crash {
-        animation: warningFlash 0.3s ease 3;
-      }
+      body.pre-crash { animation: warningFlash 0.3s ease 3; }
+
     </style>
   </head>
   <body>
-    <div id="topbar">
-      <div class="dot dot-r"></div>
-      <div class="dot dot-y"></div>
-      <div class="dot dot-g"></div>
-      <div id="topbar-title">
-        wendell.casul — <span>ai engineer</span> / portfolio-v1.0
-      </div>
-      <div class="status-badge">● LIVE</div>
-    </div>
 
-    <div id="main">
-      <!-- SIDEBAR -->
-      <div id="sidebar">
-        <div class="side-section">Navigate</div>
-        <div
-          class="side-cmd active"
-          onclick="sendQuick('Introduce yourself, Wendell.')"
-        >
-          <span class="icon">⚡</span> Overview
-        </div>
-        <div
-          class="side-cmd"
-          onclick="sendQuick('Tell me about your work experience in detail.')"
-        >
-          <span class="icon">🗂</span> Experience
-        </div>
-        <div
-          class="side-cmd"
-          onclick="sendQuick('What projects have you built?')"
-        >
-          <span class="icon">🚀</span> Projects
-        </div>
-        <div
-          class="side-cmd"
-          onclick="sendQuick('What are your technical skills and stack?')"
-        >
-          <span class="icon">🔧</span> Stack
-        </div>
-        <div
-          class="side-cmd"
-          onclick="sendQuick('How do you use AI in your development workflow?')"
-        >
-          <span class="icon">🤖</span> AI Workflow
-        </div>
-        <div
-          class="side-cmd"
-          onclick="
-            sendQuick('What kind of role or opportunity are you looking for?')
-          "
-        >
-          <span class="icon">🎯</span> Open To
-        </div>
-        <div class="side-divider"></div>
-        <div class="side-section">Ask Anything</div>
-        <div
-          class="side-cmd"
-          onclick="sendQuick('What makes you different from other developers?')"
-        >
-          <span class="icon">✦</span> Why Wendell
-        </div>
-        <div
-          class="side-cmd"
-          onclick="
-            sendQuick('What is Spec-Driven Development and how do you use it?')
-          "
-        >
-          <span class="icon">📐</span> SDD Method
-        </div>
-        <div class="side-cmd" onclick="sendQuick('How can I contact you?')">
-          <span class="icon">📡</span> Contact
-        </div>
-        <div id="avatar-wrap">
-          <div id="avatar-card">
-            <div id="avatar-name">Wendell B. Casul</div>
-            <div id="avatar-role">AI Engineer · Full-Stack</div>
-            <div id="avatar-loc">📍 Cebu City, PH</div>
-          </div>
-        </div>
-      </div>
+  <div id="topbar">
+    <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+    <div id="topbar-title">wendell.casul — <span>ai engineer</span> / portfolio-v1.0</div>
+    <div class="status-badge">● LIVE</div>
+  </div>
 
-      <!-- TERMINAL -->
-      <div id="terminal">
-        <div id="output"></div>
-        <div id="quick-wrap">
-          <div class="quick-label">Quick Prompts →</div>
-          <button
-            class="qbtn"
-            onclick="sendQuick('Introduce yourself, Wendell.')"
-          >
-            ⚡ intro
-          </button>
-          <button
-            class="qbtn"
-            onclick="sendQuick('What projects have you built?')"
-          >
-            🚀 projects
-          </button>
-          <button
-            class="qbtn"
-            onclick="sendQuick('What are your technical skills and stack?')"
-          >
-            🔧 stack
-          </button>
-          <button
-            class="qbtn"
-            onclick="sendQuick('How do you use AI in your workflow?')"
-          >
-            🤖 ai workflow
-          </button>
-          <button
-            class="qbtn"
-            onclick="
-              sendQuick('What makes you different from other developers?')
-            "
-          >
-            ✦ why me
-          </button>
-          <button class="qbtn" onclick="sendQuick('How can I contact you?')">
-            📡 contact
-          </button>
-        </div>
-        <div id="input-bar">
-          <span id="prompt-sym">›_</span>
-          <input
-            id="input"
-            type="text"
-            placeholder="Ask anything or type /help for commands..."
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button id="send-btn" onclick="handleSend()">SEND ↵</button>
-        </div>
-      </div>
+  <div id="main">
 
-      <!-- RIGHT PANEL -->
-      <div id="right-panel">
-        <div class="rp-title">Skills Index</div>
-        <div class="skill-row">
-          AI / LLM Integration
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 92%"></div>
-          </div>
-        </div>
-        <div class="skill-row">
-          React · TypeScript
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 85%"></div>
-          </div>
-        </div>
-        <div class="skill-row">
-          PHP · Laravel
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 88%"></div>
-          </div>
-        </div>
-        <div class="skill-row">
-          Node.js · APIs
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 80%"></div>
-          </div>
-        </div>
-        <div class="skill-row">
-          Docker · AWS
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 75%"></div>
-          </div>
-        </div>
-        <div class="skill-row">
-          Prompt Engineering
-          <div class="skill-bar-wrap">
-            <div class="skill-bar" style="width: 90%"></div>
-          </div>
-        </div>
-        <div class="rp-divider"></div>
-        <div class="rp-title">Tools</div>
-        <span class="tag-pill hot">Claude</span
-        ><span class="tag-pill hot">Cursor IDE</span
-        ><span class="tag-pill hot">SpecKit</span>
-        <span class="tag-pill">ChatGPT</span><span class="tag-pill">Grok</span
-        ><span class="tag-pill">Docker</span> <span class="tag-pill">AWS</span
-        ><span class="tag-pill">WebSockets</span>
-        <div class="rp-divider"></div>
-        <div class="rp-title">Experience</div>
-        <div class="exp-badge">5+ years</div>
-        <div class="skill-row" style="font-size: 10px; color: var(--dim)">
-          Forty Degree Celsius Inc.<br /><span
-            style="color: var(--muted); font-size: 9px"
-            >Jul 2023 – Present</span
-          >
-        </div>
-        <div class="skill-row" style="font-size: 10px; color: var(--dim)">
-          Maple Muramoto PH Inc.<br /><span
-            style="color: var(--muted); font-size: 9px"
-            >Jun 2021 – Jul 2023</span
-          >
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="side-section">Navigate</div>
+      <div class="side-cmd active" onclick="sendQuick('Introduce yourself, Wendell.')"><span class="icon">⚡</span> Overview</div>
+      <div class="side-cmd" onclick="sendQuick('Tell me about your work experience in detail.')"><span class="icon">🗂</span> Experience</div>
+      <div class="side-cmd" onclick="sendQuick('What projects have you built?')"><span class="icon">🚀</span> Projects</div>
+      <div class="side-cmd" onclick="sendQuick('What are your technical skills and stack?')"><span class="icon">🔧</span> Stack</div>
+      <div class="side-cmd" onclick="sendQuick('How do you use AI in your development workflow?')"><span class="icon">🤖</span> AI Workflow</div>
+      <div class="side-cmd" onclick="sendQuick('What kind of role or opportunity are you looking for?')"><span class="icon">🎯</span> Open To</div>
+      <div class="side-divider"></div>
+      <div class="side-section">Ask Anything</div>
+      <div class="side-cmd" onclick="sendQuick('What makes you different from other developers?')"><span class="icon">✦</span> Why Wendell</div>
+      <div class="side-cmd" onclick="sendQuick('What is Spec-Driven Development and how do you use it?')"><span class="icon">📐</span> SDD Method</div>
+      <div class="side-cmd" onclick="sendQuick('How can I contact you?')"><span class="icon">📡</span> Contact</div>
+      <div id="avatar-wrap">
+        <div id="avatar-card">
+          <div id="avatar-name">Wendell B. Casul</div>
+          <div id="avatar-role">AI Engineer · Full-Stack</div>
+          <div id="avatar-loc">📍 Cebu City, PH</div>
         </div>
       </div>
     </div>
 
-    <!-- CRASH OVERLAY -->
-    <div id="crash-overlay">
-      <canvas id="crash-canvas"></canvas>
-      <div id="crash-content">
-        <div id="crash-code">
-          ⚠ FATAL ERROR :: MEMORY_OVERFLOW_EXCEPTION :: 0xDEADBEEF
-        </div>
-        <span id="crash-skull">💀</span>
-        <div id="crash-title">SYSTEM OVERLOAD</div>
-        <div id="crash-sub">
-          You've pushed Wendell's AI to its limits.<br />
-          <span>Too many questions detected.</span> The system cannot handle
-          your curiosity.<br /><br />
-          If you're this interested — just reach out directly.
-        </div>
-        <div class="crash-contact-box">
-          <div class="cc-label">// Direct Contact</div>
-          <div class="cc-row">
-            <span>email</span>
-            <a href="mailto:casulwendell12@gmail.com"
-              >casulwendell12@gmail.com</a
-            >
-          </div>
-          <div class="cc-row"><span>phone</span> +63 966 771 6434</div>
-          <div class="cc-row">
-            <span>location</span> Cebu City, PH — open to international
-          </div>
-        </div>
-        <button id="crash-restart" onclick="restartFromCrash()">
-          ↺ Reboot System
-        </button>
-        <div id="crash-counter"></div>
+    <!-- TERMINAL -->
+    <div id="terminal">
+      <div id="output"></div>
+      <div id="quick-wrap">
+        <div class="quick-label">Quick Prompts →</div>
+        <button class="qbtn" onclick="sendQuick('Introduce yourself, Wendell.')">⚡ intro</button>
+        <button class="qbtn" onclick="sendQuick('What projects have you built?')">🚀 projects</button>
+        <button class="qbtn" onclick="sendQuick('What are your technical skills and stack?')">🔧 stack</button>
+        <button class="qbtn" onclick="sendQuick('How do you use AI in your workflow?')">🤖 ai workflow</button>
+        <button class="qbtn" onclick="sendQuick('What makes you different from other developers?')">✦ why me</button>
+        <button class="qbtn" onclick="sendQuick('How can I contact you?')">📡 contact</button>
+      </div>
+      <div id="input-bar">
+        <span id="prompt-sym">›_</span>
+        <input id="input" type="text" placeholder="Ask anything or type /help for commands..." autocomplete="off" spellcheck="false" />
+        <button id="send-btn" onclick="handleSend()">SEND ↵</button>
       </div>
     </div>
 
-    <script>
-      // ── Tech badge definitions ─────────────────────────────
-      // keyword (lowercase) → { label, icon URL from CDN }
-      const TECH_MAP = [
-        {
-          keys: ["react"],
-          label: "React",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-        },
-        {
-          keys: ["typescript", "ts"],
-          label: "TypeScript",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
-        },
-        {
-          keys: ["javascript", "js"],
-          label: "JavaScript",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-        },
-        {
-          keys: ["node", "node.js"],
-          label: "Node.js",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-        },
-        {
-          keys: ["php"],
-          label: "PHP",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
-        },
-        {
-          keys: ["laravel"],
-          label: "Laravel",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",
-        },
-        {
-          keys: ["cakephp"],
-          label: "CakePHP",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cakephp/cakephp-original.svg",
-        },
-        {
-          keys: ["docker"],
-          label: "Docker",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-        },
-        {
-          keys: ["aws"],
-          label: "AWS",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg",
-        },
-        {
-          keys: ["mysql"],
-          label: "MySQL",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-        },
-        {
-          keys: ["postgresql", "postgres"],
-          label: "PostgreSQL",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-        },
-        {
-          keys: ["redis"],
-          label: "Redis",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
-        },
-        {
-          keys: ["git"],
-          label: "Git",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
-        },
-        {
-          keys: ["github"],
-          label: "GitHub",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
-        },
-        {
-          keys: ["linux", "ubuntu", "ssh"],
-          label: "Linux",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
-        },
-        {
-          keys: ["python"],
-          label: "Python",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
-        },
-        {
-          keys: ["html"],
-          label: "HTML",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-        },
-        {
-          keys: ["css"],
-          label: "CSS",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-        },
-        {
-          keys: ["websocket", "websockets"],
-          label: "WebSockets",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg",
-        },
-        {
-          keys: ["restful", "rest api", "rest"],
-          label: "REST API",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
-        },
-        {
-          keys: ["claude", "anthropic"],
-          label: "Claude AI",
-          icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Claude_AI_logo.svg/120px-Claude_AI_logo.svg.png",
-        },
-        {
-          keys: ["chatgpt", "openai", "gpt"],
-          label: "OpenAI",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/openai/openai-original.svg",
-        },
-        {
-          keys: ["cursor"],
-          label: "Cursor IDE",
-          icon: "https://www.cursor.com/favicon.ico",
-        },
-        {
-          keys: ["visual basic", "vb"],
-          label: "Visual Basic",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualbasic/visualbasic-original.svg",
-        },
-        {
-          keys: ["erp"],
-          label: "ERP",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg",
-        },
-        {
-          keys: ["slim"],
-          label: "Slim PHP",
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
-        },
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="rp-title">Skills Index</div>
+      <div class="skill-row">AI / LLM Integration<div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div></div>
+      <div class="skill-row">React · TypeScript<div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div></div>
+      <div class="skill-row">PHP · Laravel<div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div></div>
+      <div class="skill-row">Node.js · APIs<div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div></div>
+      <div class="skill-row">Docker · AWS<div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div></div>
+      <div class="skill-row">Prompt Engineering<div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div></div>
+      <div class="rp-divider"></div>
+      <div class="rp-title">Tools</div>
+      <span class="tag-pill hot">Claude</span><span class="tag-pill hot">Cursor IDE</span><span class="tag-pill hot">SpecKit</span>
+      <span class="tag-pill">ChatGPT</span><span class="tag-pill">Grok</span><span class="tag-pill">Docker</span>
+      <span class="tag-pill">AWS</span><span class="tag-pill">WebSockets</span>
+      <div class="rp-divider"></div>
+      <div class="rp-title">Experience</div>
+      <div class="exp-badge">5+ years</div>
+      <div class="skill-row" style="font-size:10px;color:var(--dim)">Forty Degree Celsius Inc.<br/><span style="color:var(--muted);font-size:9px">Jul 2023 – Present</span></div>
+      <div class="skill-row" style="font-size:10px;color:var(--dim)">Maple Muramoto PH Inc.<br/><span style="color:var(--muted);font-size:9px">Jun 2021 – Jul 2023</span></div>
+    </div>
+
+  </div>
+
+
+  <!-- CRASH OVERLAY -->
+  <div id="crash-overlay">
+    <canvas id="crash-canvas"></canvas>
+    <div id="crash-content">
+      <div id="crash-code">⚠ FATAL ERROR :: MEMORY_OVERFLOW_EXCEPTION :: 0xDEADBEEF</div>
+      <span id="crash-skull">💀</span>
+      <div id="crash-title">SYSTEM OVERLOAD</div>
+      <div id="crash-sub">
+        You've pushed Wendell's AI to its limits.<br/>
+        <span>Too many questions detected.</span> The system cannot handle your curiosity.<br/><br/>
+        If you're this interested — just reach out directly.
+      </div>
+      <div class="crash-contact-box">
+        <div class="cc-label">// Direct Contact</div>
+        <div class="cc-row"><span>email</span> <a href="mailto:casulwendell12@gmail.com">casulwendell12@gmail.com</a></div>
+        <div class="cc-row"><span>phone</span> +63 966 771 6434</div>
+        <div class="cc-row"><span>location</span> Cebu City, PH — open to international</div>
+      </div>
+      <button id="crash-restart" onclick="restartFromCrash()">↺ Reboot System</button>
+      <div id="crash-counter"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Inline tech icon map ──────────────────────────────
+    // Each entry: patterns to match (word-boundary safe), display label, icon URL
+    const TECH_MAP = [
+      { pattern: /\bReact\b/g,                label: 'React',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+      { pattern: /\bTypeScript\b/g,           label: 'TypeScript',   icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' },
+      { pattern: /\bJavaScript\b/g,           label: 'JavaScript',   icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' },
+      { pattern: /\bNode\.js\b/g,            label: 'Node.js',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' },
+      { pattern: /\bLaravel\b/g,              label: 'Laravel',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg' },
+      { pattern: /\bCakePHP\b/g,              label: 'CakePHP',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cakephp/cakephp-original.svg' },
+      { pattern: /\bPHP\b/g,                  label: 'PHP',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg' },
+      { pattern: /\bDocker\b/g,               label: 'Docker',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+      { pattern: /\bAWS\b/g,                  label: 'AWS',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg' },
+      { pattern: /\bMySQL\b/g,                label: 'MySQL',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+      { pattern: /\bPostgreSQL\b/g,           label: 'PostgreSQL',   icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+      { pattern: /\bRedis\b/g,                label: 'Redis',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg' },
+      { pattern: /\bGitHub\b/g,               label: 'GitHub',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg' },
+      { pattern: /\bGit\b/g,                  label: 'Git',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+      { pattern: /\bLinux\b|\bUbuntu\b/g,   label: 'Linux',        icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg' },
+      { pattern: /\bPython\b/g,               label: 'Python',       icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
+      { pattern: /\bHTML\b/g,                 label: 'HTML',         icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg' },
+      { pattern: /\bCSS\b/g,                  label: 'CSS',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg' },
+      { pattern: /\bWebSockets?\b/g,          label: 'WebSockets',   icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg' },
+      { pattern: /\bREST(?:ful)?(?:\s+API)?\b/g, label: 'REST API', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg' },
+      { pattern: /\bClaude\b|\bAnthropic\b/g, label: 'Claude AI', icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Claude_AI_logo.svg/120px-Claude_AI_logo.svg.png' },
+      { pattern: /\bChatGPT\b|\bOpenAI\b/g, label: 'OpenAI',      icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/openai/openai-original.svg' },
+      { pattern: /\bCursor(?:\s+IDE)?\b/g,   label: 'Cursor IDE',   icon: 'https://www.cursor.com/favicon.ico' },
+      { pattern: /\bVisual\s+Basic\b/g,      label: 'Visual Basic', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualbasic/visualbasic-original.svg' },
+      { pattern: /\bSlim\b/g,                 label: 'Slim',         icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg' },
+      { pattern: /\bSSH\b/g,                  label: 'SSH',          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg' },
+    ];
+
+    // Replace matched tech keywords in text with inline icon + label spans
+    function injectInlineIcons(text) {
+      // First escape HTML special chars (we'll build safe HTML)
+      let result = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Then apply markdown formatting
+      result = result
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>');
+
+      // Then inject inline icons — replace each matched keyword with icon+text span
+      // We work on the raw text first (before HTML injection) to avoid mangling tags
+      // So we do a two-pass: build a replacer that works on the escaped+formatted string
+      for (const tech of TECH_MAP) {
+        // Build replacement: tiny icon before the matched word
+        const imgTag = `<img src="${tech.icon}" alt="${tech.label}" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;border-radius:2px;position:relative;top:-1px;margin-right:2px;" onerror="this.style.display='none'">`;
+        result = result.replace(tech.pattern, (match) => {
+          return `<span class="tech-inline">${imgTag}${match}</span>`;
+        });
+      }
+
+      return result;
+    }
+
+    // ── Core chat logic ────────────────────────────────────
+    const conversationHistory = [];
+
+    // ── Crash screen logic ─────────────────────────────────
+    const CRASH_THRESHOLD = 5; // questions before crash
+    let questionCount = 0;
+    let crashed = false;
+
+    function triggerCrash() {
+      crashed = true;
+      sendBtn.disabled = true;
+      input.disabled = true;
+
+      // Pre-crash warning flashes
+      document.body.classList.add('pre-crash');
+      setTimeout(() => document.body.classList.remove('pre-crash'), 900);
+
+      // Glitch the terminal for dramatic effect
+      let glitchCount = 0;
+      const glitchInterval = setInterval(() => {
+        document.getElementById('terminal').style.transform =
+          glitchCount % 2 === 0 ? `translate(${Math.random()*6-3}px, ${Math.random()*4-2}px)` : 'none';
+        glitchCount++;
+        if (glitchCount > 10) {
+          clearInterval(glitchInterval);
+          document.getElementById('terminal').style.transform = 'none';
+          showCrashOverlay();
+        }
+      }, 80);
+    }
+
+    function showCrashOverlay() {
+      const overlay = document.getElementById('crash-overlay');
+      overlay.classList.add('active');
+      startCrashCanvas();
+
+      // Typewriter the error code
+      const codeEl = document.getElementById('crash-code');
+      const msgs = [
+        '⚠ FATAL ERROR :: MEMORY_OVERFLOW_EXCEPTION :: 0xDEADBEEF',
+        '⚠ STACK TRACE :: curiosity_level exceeded threshold',
+        '⚠ FATAL ERROR :: TOO_MANY_QUESTIONS :: 0xDEADBEEF',
       ];
+      let m = 0;
+      setInterval(() => { codeEl.textContent = msgs[m++ % msgs.length]; }, 1800);
+    }
 
-      // Detect which badges to show based on AI response text
-      function detectBadges(text) {
-        const lower = text.toLowerCase();
-        const found = [];
-        const seen = new Set();
-        for (const tech of TECH_MAP) {
-          if (seen.has(tech.label)) continue;
-          if (tech.keys.some((k) => lower.includes(k))) {
-            found.push(tech);
-            seen.add(tech.label);
-          }
-        }
-        return found;
-      }
+    function startCrashCanvas() {
+      const canvas = document.getElementById('crash-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-      // Build badge strip HTML
-      function buildBadgeStrip(badges) {
-        if (!badges.length) return null;
-        const strip = document.createElement("div");
-        strip.className = "badge-strip";
-        const label = document.createElement("div");
-        label.className = "badge-strip-label";
-        label.textContent = "Technologies mentioned";
-        strip.appendChild(label);
-        badges.forEach((b) => {
-          const badge = document.createElement("div");
-          badge.className = "tech-badge";
-          const img = document.createElement("img");
-          img.src = b.icon;
-          img.alt = b.label;
-          img.onerror = () => {
-            img.style.display = "none";
-          }; // hide broken icons gracefully
-          const span = document.createElement("span");
-          span.textContent = b.label;
-          badge.appendChild(img);
-          badge.appendChild(span);
-          strip.appendChild(badge);
+      // Matrix-style falling red characters
+      const cols = Math.floor(canvas.width / 16);
+      const drops = Array(cols).fill(0).map(() => Math.random() * canvas.height / 16);
+      const chars = '01アイウエオカキクケコ{}[]<>/\|FATAL ERROR OVERFLOW DEAD';
+
+      function drawMatrix() {
+        ctx.fillStyle = 'rgba(0,0,0,0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '13px "JetBrains Mono", monospace';
+
+        drops.forEach((y, i) => {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          const isRed = Math.random() > 0.7;
+          ctx.fillStyle = isRed ? '#ff4c6a' : '#ff4c6a44';
+          ctx.fillText(char, i * 16, y * 16);
+          if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i] += 0.5;
         });
-        return strip;
       }
 
-      // ── Core chat logic ────────────────────────────────────
-      const conversationHistory = [];
+      setInterval(drawMatrix, 40);
+    }
 
-      // ── Crash screen logic ─────────────────────────────────
-      const CRASH_THRESHOLD = 5; // questions before crash
-      let questionCount = 0;
-      let crashed = false;
+    function restartFromCrash() {
+      document.getElementById('crash-overlay').classList.remove('active');
+      output.innerHTML = '';
+      conversationHistory.length = 0;
+      questionCount = 0;
+      crashed = false;
+      sendBtn.disabled = false;
+      input.disabled = false;
+      input.focus();
+      appendMessage('system', '> System rebooted. Memory cleared. Welcome back.');
+    }
 
-      function triggerCrash() {
-        crashed = true;
-        sendBtn.disabled = true;
-        input.disabled = true;
 
-        // Pre-crash warning flashes
-        document.body.classList.add("pre-crash");
-        setTimeout(() => document.body.classList.remove("pre-crash"), 900);
+    const output  = document.getElementById('output');
+    const input   = document.getElementById('input');
+    const sendBtn = document.getElementById('send-btn');
 
-        // Glitch the terminal for dramatic effect
-        let glitchCount = 0;
-        const glitchInterval = setInterval(() => {
-          document.getElementById("terminal").style.transform =
-            glitchCount % 2 === 0
-              ? `translate(${Math.random() * 6 - 3}px, ${Math.random() * 4 - 2}px)`
-              : "none";
-          glitchCount++;
-          if (glitchCount > 10) {
-            clearInterval(glitchInterval);
-            document.getElementById("terminal").style.transform = "none";
-            showCrashOverlay();
-          }
-        }, 80);
-      }
+    function appendMessage(role, text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-wrap';
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      const timeStr = new Date().toLocaleTimeString('en-US', { hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
 
-      function showCrashOverlay() {
-        const overlay = document.getElementById("crash-overlay");
-        overlay.classList.add("active");
-        startCrashCanvas();
+      if (role === 'user') {
+        meta.innerHTML = `<span class="tag tag-user">YOU</span><span>${timeStr}</span>`;
+        const body = document.createElement('div');
+        body.className = 'msg-body user-body';
+        body.textContent = text;
+        wrap.appendChild(meta); wrap.appendChild(body);
 
-        // Typewriter the error code
-        const codeEl = document.getElementById("crash-code");
-        const msgs = [
-          "⚠ FATAL ERROR :: MEMORY_OVERFLOW_EXCEPTION :: 0xDEADBEEF",
-          "⚠ STACK TRACE :: curiosity_level exceeded threshold",
-          "⚠ FATAL ERROR :: TOO_MANY_QUESTIONS :: 0xDEADBEEF",
-        ];
-        let m = 0;
-        setInterval(() => {
-          codeEl.textContent = msgs[m++ % msgs.length];
-        }, 1800);
-      }
+      } else if (role === 'system') {
+        meta.innerHTML = `<span class="tag tag-sys">SYS</span><span>${timeStr}</span>`;
+        const body = document.createElement('div');
+        body.className = 'msg-body sys-body';
+        body.textContent = text;
+        wrap.appendChild(meta); wrap.appendChild(body);
 
-      function startCrashCanvas() {
-        const canvas = document.getElementById("crash-canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // Matrix-style falling red characters
-        const cols = Math.floor(canvas.width / 16);
-        const drops = Array(cols)
-          .fill(0)
-          .map(() => (Math.random() * canvas.height) / 16);
-        const chars =
-          "01アイウエオカキクケコ{}[]<>/\|FATAL ERROR OVERFLOW DEAD";
-
-        function drawMatrix() {
-          ctx.fillStyle = "rgba(0,0,0,0.05)";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.font = '13px "JetBrains Mono", monospace';
-
-          drops.forEach((y, i) => {
-            const char = chars[Math.floor(Math.random() * chars.length)];
-            const isRed = Math.random() > 0.7;
-            ctx.fillStyle = isRed ? "#ff4c6a" : "#ff4c6a44";
-            ctx.fillText(char, i * 16, y * 16);
-            if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i] += 0.5;
-          });
-        }
-
-        setInterval(drawMatrix, 40);
-      }
-
-      function restartFromCrash() {
-        document.getElementById("crash-overlay").classList.remove("active");
-        output.innerHTML = "";
-        conversationHistory.length = 0;
-        questionCount = 0;
-        crashed = false;
-        sendBtn.disabled = false;
-        input.disabled = false;
-        input.focus();
-        appendMessage(
-          "system",
-          "> System rebooted. Memory cleared. Welcome back.",
-        );
-      }
-
-      const output = document.getElementById("output");
-      const input = document.getElementById("input");
-      const sendBtn = document.getElementById("send-btn");
-
-      function formatText(text) {
-        return text
-          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-          .replace(/\*(.*?)\*/g, "<em>$1</em>")
-          .replace(/`(.*?)`/g, "<code>$1</code>");
-      }
-
-      function appendMessage(role, text) {
-        const wrap = document.createElement("div");
-        wrap.className = "msg-wrap";
-        const meta = document.createElement("div");
-        meta.className = "msg-meta";
-        const timeStr = new Date().toLocaleTimeString("en-US", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        });
-
-        if (role === "user") {
-          meta.innerHTML = `<span class="tag tag-user">YOU</span><span>${timeStr}</span>`;
-          const body = document.createElement("div");
-          body.className = "msg-body user-body";
-          body.textContent = text;
-          wrap.appendChild(meta);
-          wrap.appendChild(body);
-        } else if (role === "system") {
-          meta.innerHTML = `<span class="tag tag-sys">SYS</span><span>${timeStr}</span>`;
-          const body = document.createElement("div");
-          body.className = "msg-body sys-body";
-          body.textContent = text;
-          wrap.appendChild(meta);
-          wrap.appendChild(body);
-        } else {
-          // AI message — add text then badge strip
-          meta.innerHTML = `<span class="tag tag-ai">WENDELL</span><span>${timeStr}</span>`;
-          const body = document.createElement("div");
-          body.className = "msg-body";
-          body.innerHTML = formatText(text);
-          wrap.appendChild(meta);
-          wrap.appendChild(body);
-
-          // Detect and inject tech badges
-          const badges = detectBadges(text);
-          const strip = buildBadgeStrip(badges);
-          if (strip) wrap.appendChild(strip);
-        }
-
-        output.appendChild(wrap);
-        output.scrollTop = output.scrollHeight;
-        return wrap;
-      }
-
-      function appendLoading() {
-        const wrap = document.createElement("div");
-        wrap.className = "msg-wrap";
-        wrap.id = "loading-msg";
-        const meta = document.createElement("div");
-        meta.className = "msg-meta";
-        meta.innerHTML = `<span class="tag tag-ai">WENDELL</span>`;
-        const body = document.createElement("div");
-        body.className = "msg-body";
-        body.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+      } else {
+        // AI message — inline icons injected directly into text
+        meta.innerHTML = `<span class="tag tag-ai">WENDELL</span><span>${timeStr}</span>`;
+        const body = document.createElement('div');
+        body.className = 'msg-body';
+        body.innerHTML = injectInlineIcons(text);
         wrap.appendChild(meta);
         wrap.appendChild(body);
-        output.appendChild(wrap);
-        output.scrollTop = output.scrollHeight;
-        return wrap;
+
+        // Inject project cards if any projects are mentioned
+        const mentionedProjects = detectProjects(text);
+        const cards = renderProjectCards(mentionedProjects);
+        if (cards) wrap.appendChild(cards);
       }
 
-      async function sendMessage(userText, skipUserBubble = false) {
-        if (!userText.trim()) return;
-        sendBtn.disabled = true;
-        input.disabled = true;
-        if (!skipUserBubble) appendMessage("user", userText);
-        conversationHistory.push({ role: "user", content: userText });
-        const loadingEl = appendLoading();
+      output.appendChild(wrap);
+      output.scrollTop = output.scrollHeight;
+      return wrap;
+    }
 
-        try {
-          const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ messages: conversationHistory }),
-          });
-          const data = await response.json();
-          loadingEl.remove();
+    function appendLoading() {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-wrap';
+      wrap.id = 'loading-msg';
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      meta.innerHTML = `<span class="tag tag-ai">WENDELL</span>`;
+      const body = document.createElement('div');
+      body.className = 'msg-body';
+      body.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+      wrap.appendChild(meta); wrap.appendChild(body);
+      output.appendChild(wrap);
+      output.scrollTop = output.scrollHeight;
+      return wrap;
+    }
 
-          if (data.content && data.content[0]) {
-            const aiText = data.content[0].text;
-            appendMessage("ai", aiText);
-            conversationHistory.push({ role: "assistant", content: aiText });
-            questionCount++;
-            if (!crashed && questionCount >= CRASH_THRESHOLD) {
-              setTimeout(triggerCrash, 600);
-            }
-          } else {
-            appendMessage("system", `Error: ${data.error || "Unknown error."}`);
-          }
-        } catch (err) {
-          loadingEl.remove();
-          appendMessage(
-            "system",
-            "Network error — make sure the server is running.",
-          );
+    async function sendMessage(userText, skipUserBubble = false) {
+      if (!userText.trim()) return;
+      sendBtn.disabled = true;
+      input.disabled = true;
+      if (!skipUserBubble) appendMessage('user', userText);
+      conversationHistory.push({ role: 'user', content: userText });
+      const loadingEl = appendLoading();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: conversationHistory }),
+        });
+        const data = await response.json();
+        loadingEl.remove();
+
+        if (data.content && data.content[0]) {
+          const aiText = data.content[0].text;
+          appendMessage('ai', aiText);
+          conversationHistory.push({ role: 'assistant', content: aiText });
+          questionCount++;
+          if (!crashed && questionCount >= CRASH_THRESHOLD) { setTimeout(triggerCrash, 600); }
+        } else {
+          appendMessage('system', `Error: ${data.error || 'Unknown error.'}`);
         }
-
-        sendBtn.disabled = false;
-        input.disabled = false;
-        input.focus();
+      } catch (err) {
+        loadingEl.remove();
+        appendMessage('system', 'Network error — make sure the server is running.');
       }
 
-      // ── Commands ───────────────────────────────────────────
-      const COMMANDS = {
-        "/clear": () => {
-          output.innerHTML = "";
-          conversationHistory.length = 0;
-          appendMessage("system", "> Chat cleared. History reset.");
-        },
-        "/help": () => {
-          appendMessage(
-            "system",
-            [
-              "> Available commands:",
-              "  /clear   — clear chat and reset conversation history",
-              "  /reset   — same as /clear",
-              "  /stack   — show full tech stack",
-              "  /contact — show contact details",
-              "  /hi      — say hello to Wendell",
-              "  /help    — show this help menu",
-            ].join("\n"),
-          );
-        },
-        "/reset": () => COMMANDS["/clear"](),
-        "/stack": () =>
-          sendMessage(
-            "List every technology and tool in your stack in detail.",
-            true,
-          ),
-        "/contact": () =>
-          sendMessage(
-            "How can I contact you? Give me all your contact details.",
-            true,
-          ),
-        "/hi": () => sendMessage("Hey Wendell!", true),
-      };
+      sendBtn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }
 
-      function handleSend() {
-        const val = input.value.trim();
-        if (!val) return;
-        input.value = "";
 
-        const cmd = val.toLowerCase();
-        if (COMMANDS[cmd]) {
-          appendMessage("user", val);
-          COMMANDS[cmd]();
-          return;
-        }
+    // ── Project definitions ────────────────────────────────
+    const PROJECTS = [
+      {
+        keywords: ['lulu live', 'lululive', 'lulu'],
+        title: 'LuLu Live',
+        desc: 'Live social app with AI-powered onboarding and engagement features. Built LLM integration for enhanced user interaction and real-time workflow experiences.',
+        tags: ['CakePHP', 'LLM Integration', 'AWS', 'Docker', 'WebSockets'],
+        url: 'https://www.lululiveapp.com/',
+        thumb: 'https://www.lululiveapp.com/ogp.png',
+        emoji: '📡',
+      },
+      {
+        keywords: ['ciao'],
+        title: 'Ciao by LuLu',
+        desc: 'Companion product to LuLu Live — a real-time communication platform with AI-assisted features and backend API integration.',
+        tags: ['CakePHP', 'Laravel', 'AI', 'Real-time'],
+        url: 'https://www.lululiveapp.com/ciao',
+        thumb: 'https://www.lululiveapp.com/ogp.png',
+        emoji: '💬',
+      },
+      {
+        keywords: ['nativecamp', 'native camp'],
+        title: 'NativeCamp Tutor Portal',
+        desc: 'Online English tutoring platform serving 500,000+ students across 110+ countries. Built and maintained backend systems supporting tutor onboarding and scheduling.',
+        tags: ['PHP', 'Laravel', 'REST API', 'MySQL'],
+        url: 'https://nativecamp.net/tutors',
+        thumb: 'https://nativecamp.net/tutor/image/ogp.webp',
+        emoji: '🌍',
+      },
+      {
+        keywords: ['maids r us', 'maidsrus', 'maid', 'cleaning'],
+        title: 'Maids R Us Cleaning',
+        desc: 'Professional cleaning services website for a Melbourne-based company. Full-stack web development with booking system, service pages, and SEO optimization.',
+        tags: ['PHP', 'WordPress', 'Elementor', 'SEO'],
+        url: 'https://maidsruscleaning.com.au/',
+        thumb: 'https://maidsruscleaning.com.au/wp-content/uploads/elementor/thumbs/7cfa1f97-7dfe-49b5-ac70-d58e2a8d9200-rhyosrupiias5mjxqn8bsek1sy3nz21flg3jq1hdc0.webp',
+        emoji: '🧹',
+      },
+    ];
 
-        if (val.startsWith("/")) {
-          appendMessage("user", val);
-          appendMessage(
-            "system",
-            `> Unknown command: "${val}"\n> Type /help to see available commands.`,
-          );
-          return;
-        }
+    // Detect projects mentioned in AI response and render cards
+    function detectProjects(text) {
+      const lower = text.toLowerCase();
+      return PROJECTS.filter(p => p.keywords.some(k => lower.includes(k)));
+    }
 
-        sendMessage(val);
-      }
+    function renderProjectCards(projects) {
+      if (!projects.length) return null;
+      const wrap = document.createElement('div');
+      wrap.className = 'project-cards-wrap';
 
-      function sendQuick(text) {
-        input.value = text;
-        handleSend();
-        document
-          .querySelectorAll(".side-cmd")
-          .forEach((el) => el.classList.remove("active"));
-      }
+      projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
 
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          handleSend();
-        }
+        // Thumbnail
+        const img = document.createElement('img');
+        img.className = 'project-card-thumb';
+        img.alt = p.title;
+        img.src = p.thumb;
+        img.onerror = () => {
+          // fallback emoji block
+          const fallback = document.createElement('div');
+          fallback.className = 'project-card-thumb-fallback';
+          fallback.textContent = p.emoji;
+          card.replaceChild(fallback, img);
+        };
+        card.appendChild(img);
+
+        // Body
+        const body = document.createElement('div');
+        body.className = 'project-card-body';
+
+        const title = document.createElement('div');
+        title.className = 'project-card-title';
+        title.textContent = p.title;
+
+        const desc = document.createElement('div');
+        desc.className = 'project-card-desc';
+        desc.textContent = p.desc;
+
+        const tags = document.createElement('div');
+        tags.className = 'project-card-tags';
+        p.tags.forEach(t => {
+          const tag = document.createElement('span');
+          tag.className = 'project-card-tag';
+          tag.textContent = t;
+          tags.appendChild(tag);
+        });
+
+        const link = document.createElement('a');
+        link.className = 'project-card-link';
+        link.href = p.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.innerHTML = '↗ View Live';
+
+        body.appendChild(title);
+        body.appendChild(desc);
+        body.appendChild(tags);
+        body.appendChild(link);
+        card.appendChild(body);
+        wrap.appendChild(card);
       });
 
-      function boot() {
-        const lines = [
-          "> Initializing wendell.portfolio v1.0...",
-          "> Loading AI context engine — OK",
-          "> Mounting knowledge base: resume, skills, projects — OK",
-          "> Connection established. Ask me anything.",
-        ];
-        let i = 0;
-        function nextLine() {
-          if (i < lines.length) {
-            appendMessage("system", lines[i++]);
-            setTimeout(nextLine, 400);
-          } else {
-            setTimeout(
-              () =>
-                sendMessage(
-                  "Introduce yourself, Wendell. Give me a compelling, personal pitch.",
-                ),
-              500,
-            );
-          }
-        }
-        nextLine();
+      return wrap;
+    }
+
+    // ── Commands ───────────────────────────────────────────
+    const COMMANDS = {
+      '/clear': () => {
+        output.innerHTML = '';
+        conversationHistory.length = 0;
+        appendMessage('system', '> Chat cleared. History reset.');
+      },
+      '/help': () => {
+        appendMessage('system', [
+          '> Available commands:',
+          '  /clear   — clear chat and reset conversation history',
+          '  /reset   — same as /clear',
+          '  /stack   — show full tech stack',
+          '  /contact  — show contact details',
+          '  /hi       — say hello to Wendell',
+          '  /download — download resume as PDF',
+          '  /help     — show this help menu',
+        ].join('\n'));
+      },
+      '/reset':   () => COMMANDS['/clear'](),
+      '/stack':   () => sendMessage('List every technology and tool in your stack in detail.', true),
+      '/contact': () => sendMessage('How can I contact you? Give me all your contact details.', true),
+      '/hi':      () => sendMessage('Hey Wendell!', true),
+      '/download': () => {
+        appendMessage('system', '> Downloading resume...\n> File: Wendell_Casul_Resume.pdf');
+        const a = document.createElement('a');
+        a.href = '/Wendell_Casul_Resume.pdf';
+        a.download = 'Wendell_Casul_Resume.pdf';
+        a.click();
+      },
+    };
+
+    function handleSend() {
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = '';
+
+      const cmd = val.toLowerCase();
+      if (COMMANDS[cmd]) {
+        appendMessage('user', val);
+        COMMANDS[cmd]();
+        return;
       }
 
-      boot();
-    </script>
+      if (val.startsWith('/')) {
+        appendMessage('user', val);
+        appendMessage('system', `> Unknown command: "${val}"\n> Type /help to see available commands.`);
+        return;
+      }
+
+      sendMessage(val);
+    }
+
+    function sendQuick(text) {
+      input.value = text;
+      handleSend();
+      document.querySelectorAll('.side-cmd').forEach(el => el.classList.remove('active'));
+    }
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+
+    function boot() {
+      const lines = [
+        '> Initializing wendell.portfolio v1.0...',
+        '> Loading AI context engine — OK',
+        '> Mounting knowledge base: resume, skills, projects — OK',
+        '> Connection established. Ask me anything.',
+      ];
+      let i = 0;
+      function nextLine() {
+        if (i < lines.length) { appendMessage('system', lines[i++]); setTimeout(nextLine, 400); }
+        else { setTimeout(() => sendMessage('Introduce yourself, Wendell. Give me a compelling, personal pitch.'), 500); }
+      }
+      nextLine();
+    }
+
+    boot();
+  </script>
   </body>
 </html>
