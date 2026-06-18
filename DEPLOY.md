@@ -1,8 +1,9 @@
 # 🚀 Wendell Portfolio — Deploy Guide
 
 Your portfolio is a Node.js app with two parts:
+
 - **`server.js`** — Express backend that holds your API key and proxies requests to Anthropic
-- **`public/index.html`** — The terminal UI that talks to *your* server (not Anthropic directly)
+- **`public/index.html`** — The terminal UI that talks to _your_ server (not Anthropic directly)
 
 ---
 
@@ -65,13 +66,13 @@ git push -u origin main
 3. Connect your GitHub account → select `wendell-portfolio`
 4. Fill in these settings:
 
-| Setting | Value |
-|---|---|
-| **Name** | `wendell-portfolio` |
-| **Environment** | `Node` |
+| Setting           | Value         |
+| ----------------- | ------------- |
+| **Name**          | ` s`          |
+| **Environment**   | `Node`        |
 | **Build Command** | `npm install` |
-| **Start Command** | `npm start` |
-| **Instance Type** | Free |
+| **Start Command** | `npm start`   |
+| **Instance Type** | Free          |
 
 5. Scroll down to **Environment Variables** → click **Add Variable**:
    - Key: `ANTHROPIC_API_KEY`
@@ -157,11 +158,11 @@ Your API key **never touches the browser**. Visitors can't see it in DevTools or
 
 ## Estimated Monthly Cost
 
-| Service | Cost |
-|---|---|
-| Render Free | $0 (sleeps after inactivity) |
-| Render Starter | ~$7/mo (always-on) |
-| Railway | ~$0–5/mo (free credit) |
-| Anthropic API | ~$0.01–0.10 per conversation |
+| Service        | Cost                         |
+| -------------- | ---------------------------- |
+| Render Free    | $0 (sleeps after inactivity) |
+| Render Starter | ~$7/mo (always-on)           |
+| Railway        | ~$0–5/mo (free credit)       |
+| Anthropic API  | ~$0.01–0.10 per conversation |
 
 A portfolio with moderate traffic costs practically nothing.
