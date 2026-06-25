@@ -4,6 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wendell B. Casul — AI Engineer</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23080b10'/><text y='72' x='12' font-size='72' font-family='monospace' fill='%2300f5d4'>W</text></svg>" />
+
+    <!-- Analytics (Umami — privacy friendly, free) -->
+    <!-- Sign up at https://umami.is → get your script tag → replace this -->
+    <!-- <script async src="https://analytics.umami.is/script.js" data-website-id="YOUR-ID-HERE"></script> -->
+
+    <!-- SEO -->
+    <meta name="description" content="Wendell B. Casul — AI Engineer & Full-Stack Developer from Cebu City, PH. 5 years experience building LLM integrations, REST APIs, and scalable web apps. Open to international opportunities." />
+    <meta name="author" content="Wendell B. Casul" />
+    <meta name="keywords" content="AI Engineer, Full-Stack Developer, LLM Integration, React, Laravel, PHP, Docker, AWS, Cebu Philippines" />
+
+    <!-- Open Graph (LinkedIn, Facebook, Slack, iMessage) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Wendell B. Casul — AI Engineer & Full-Stack Developer" />
+    <meta property="og:description" content="5 years experience building AI-powered apps, REST APIs, and scalable systems. Ask me anything — this portfolio talks back." />
+    <meta property="og:image" content="https://og-image-service.vercel.app/api?title=Wendell+B.+Casul&subtitle=AI+Engineer+%2F+Full-Stack+Dev&bg=080b10&color=00f5d4" />
+    <meta property="og:url" content="https://wendellcasul.dev" />
+    <meta property="og:site_name" content="Wendell B. Casul Portfolio" />
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Wendell B. Casul — AI Engineer & Full-Stack Developer" />
+    <meta name="twitter:description" content="5 years building AI-powered apps, REST APIs, and scalable systems. This portfolio talks back." />
+    <meta name="twitter:image" content="https://og-image-service.vercel.app/api?title=Wendell+B.+Casul&subtitle=AI+Engineer+%2F+Full-Stack+Dev&bg=080b10&color=00f5d4" />
+
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <style>
       :root {
@@ -18,6 +45,22 @@
         --mono: "JetBrains Mono", monospace;
         --topbar-h: 41px;
       }
+      /* Phosphor theme */
+      body.theme-phosphor {
+        --bg: #0a0e00;
+        --surface: #0f1400;
+        --border: #1e2a00;
+        --cyan: #39ff14;
+        --amber: #ccff00;
+        --muted: #2a3800;
+        --dim: #6a8c00;
+        --text: #b8d400;
+      }
+      body.theme-phosphor #topbar,
+      body.theme-phosphor #sidebar,
+      body.theme-phosphor #right-panel,
+      body.theme-phosphor #quick-wrap,
+      body.theme-phosphor #input-bar { filter: saturate(1.1); }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--mono); }
 
@@ -32,6 +75,18 @@
       #topbar-title { flex: 1; text-align: center; font-size: 11px; color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase; }
       #topbar-title span { color: var(--cyan); }
       .status-badge { font-size: 10px; color: var(--cyan); border: 1px solid var(--cyan); padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; animation: pulse 2s ease-in-out infinite; }
+      #visitor-badge {
+        font-size: 10px;
+        color: var(--amber);
+        border: 1px solid rgba(247,183,49,0.4);
+        padding: 2px 8px;
+        border-radius: 2px;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      #visitor-badge.loaded { opacity: 1; }
       @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
       /* ─── LAYOUT ──────────────────────────────────────── */
@@ -111,6 +166,31 @@
       #input-bar { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-top: 1px solid var(--border); background: var(--bg); }
       #prompt-sym { color: var(--cyan); font-size: 14px; font-weight: 700; flex-shrink: 0; user-select: none; }
       #input { flex: 1; background: transparent; border: none; outline: none; font-family: var(--mono); font-size: 13px; color: var(--amber); caret-color: var(--cyan); }
+      #input-bar {
+        position: relative;
+      }
+      #input-bar::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 24px; right: 24px;
+        height: 1px;
+        background: var(--cyan);
+        opacity: 0;
+        transition: opacity 0.3s, box-shadow 0.3s;
+      }
+      #input-bar.focused::after {
+        opacity: 0.6;
+        box-shadow: 0 0 8px var(--cyan), 0 0 16px rgba(0,245,212,0.3);
+      }
+      #prompt-sym {
+        color: var(--cyan); font-size: 14px; font-weight: 700; flex-shrink: 0; user-select: none;
+        text-shadow: 0 0 8px var(--cyan);
+        animation: promptGlow 2s ease-in-out infinite;
+      }
+      @keyframes promptGlow {
+        0%,100% { text-shadow: 0 0 6px var(--cyan); opacity: 1; }
+        50%      { text-shadow: 0 0 16px var(--cyan), 0 0 30px rgba(0,245,212,0.4); opacity: 0.8; }
+      }
       #input::placeholder { color: var(--muted); }
       #send-btn { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--bg); background: var(--cyan); border: none; padding: 6px 14px; border-radius: 2px; cursor: pointer; letter-spacing: 0.06em; transition: opacity 0.15s; flex-shrink: 0; }
       #send-btn:hover { opacity: 0.85; }
@@ -123,7 +203,13 @@
       .rp-title { font-size: 9px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; padding: 0 14px 8px; }
       .skill-row { padding: 6px 14px; font-size: 10px; color: var(--dim); }
       .skill-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
-      .skill-bar { height: 100%; border-radius: 2px; background: var(--cyan); }
+      .skill-bar {
+        height: 100%; border-radius: 2px;
+        background: var(--cyan);
+        width: 0% !important;
+        transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .skill-bar.animated { width: var(--target-width) !important; }
       .rp-divider { height: 1px; background: var(--border); margin: 12px 14px; }
       .tag-pill { display: inline-block; margin: 2px 3px 2px 14px; font-size: 9px; color: var(--dim); border: 1px solid var(--border); padding: 2px 6px; border-radius: 2px; letter-spacing: 0.06em; }
       .tag-pill.hot { color: var(--cyan); border-color: rgba(0,245,212,0.3); background: rgba(0,245,212,0.05); }
@@ -214,7 +300,58 @@
       }
       .project-card-link:hover { opacity: 0.85; }
       .project-cards-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-      @media (max-width: 700px) { #sidebar { display: none; } #right-panel { display: none; } }
+      /* ─── MOBILE ──────────────────────────────────────── */
+      @media (max-width: 700px) {
+        #sidebar     { display: none; }
+        #right-panel { display: none; }
+
+        /* shrink topbar title on small screens */
+        #topbar-title { font-size: 9px; letter-spacing: 0.06em; }
+        .status-badge { display: none; }
+
+        /* mobile bottom nav bar */
+        #mobile-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0; left: 0; right: 0;
+          background: var(--surface);
+          border-top: 1px solid var(--border);
+          z-index: 50;
+          height: 56px;
+        }
+        .mnav-btn {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          color: var(--muted);
+          font-family: var(--mono);
+          font-size: 8px;
+          letter-spacing: 0.06em;
+          transition: color 0.15s, background 0.15s;
+          padding: 0;
+        }
+        .mnav-btn:hover, .mnav-btn:active { color: var(--cyan); background: rgba(0,245,212,0.06); }
+        .mnav-btn .mnav-icon { font-size: 18px; line-height: 1; }
+
+        /* push chat content above bottom nav */
+        #terminal { padding-bottom: 56px; }
+        #input-bar { bottom: 56px; }
+
+        /* hide desktop quick prompts on mobile — replaced by bottom nav */
+        #quick-wrap { display: none; }
+
+        /* slightly larger input on mobile */
+        #input { font-size: 16px; } /* prevents iOS zoom on focus */
+      }
+
+      /* hide mobile nav on desktop */
+      #mobile-nav { display: none; }
 
       /* ─── CRASH SCREEN ────────────────────────────────── */
       #crash-overlay {
@@ -370,6 +507,7 @@
   <div id="topbar">
     <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
     <div id="topbar-title">wendell.casul — <span>ai engineer</span> / portfolio-v1.0</div>
+    <div id="visitor-badge">⬤ — visitors</div>
     <div class="status-badge">● LIVE</div>
   </div>
 
@@ -402,7 +540,7 @@
     <div id="terminal">
       <div id="output"></div>
       <div id="quick-wrap">
-        <div class="quick-label">Quick Prompts →</div>
+        <div class="quick-label" id="quick-label">Quick Prompts →</div>
         <button class="qbtn" onclick="sendQuick('Introduce yourself, Wendell.')">⚡ intro</button>
         <button class="qbtn" onclick="sendQuick('What projects have you built?')">🚀 projects</button>
         <button class="qbtn" onclick="sendQuick('What are your technical skills and stack?')">🔧 stack</button>
@@ -420,12 +558,12 @@
     <!-- RIGHT PANEL -->
     <div id="right-panel">
       <div class="rp-title">Skills Index</div>
-      <div class="skill-row">AI / LLM Integration<div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div></div>
-      <div class="skill-row">React · TypeScript<div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div></div>
-      <div class="skill-row">PHP · Laravel<div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div></div>
-      <div class="skill-row">Node.js · APIs<div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div></div>
-      <div class="skill-row">Docker · AWS<div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div></div>
-      <div class="skill-row">Prompt Engineering<div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div></div>
+      <div class="skill-row">AI / LLM Integration<div class="skill-bar-wrap"><div class="skill-bar" style="width:92%" data-width="92%"></div></div></div>
+      <div class="skill-row">React · TypeScript<div class="skill-bar-wrap"><div class="skill-bar" style="width:85%" data-width="85%"></div></div></div>
+      <div class="skill-row">PHP · Laravel<div class="skill-bar-wrap"><div class="skill-bar" style="width:88%" data-width="88%"></div></div></div>
+      <div class="skill-row">Node.js · APIs<div class="skill-bar-wrap"><div class="skill-bar" style="width:80%" data-width="80%"></div></div></div>
+      <div class="skill-row">Docker · AWS<div class="skill-bar-wrap"><div class="skill-bar" style="width:75%" data-width="75%"></div></div></div>
+      <div class="skill-row">Prompt Engineering<div class="skill-bar-wrap"><div class="skill-bar" style="width:90%" data-width="90%"></div></div></div>
       <div class="rp-divider"></div>
       <div class="rp-title">Tools</div>
       <span class="tag-pill hot">Claude</span><span class="tag-pill hot">Cursor IDE</span><span class="tag-pill hot">SpecKit</span>
@@ -441,6 +579,25 @@
   </div>
 
 
+  <!-- MOBILE BOTTOM NAV -->
+  <div id="mobile-nav">
+    <button class="mnav-btn" onclick="sendQuick('Introduce yourself, Wendell.')">
+      <span class="mnav-icon">⚡</span>intro
+    </button>
+    <button class="mnav-btn" onclick="handleCommand('/projects')">
+      <span class="mnav-icon">🚀</span>projects
+    </button>
+    <button class="mnav-btn" onclick="sendQuick('What are your technical skills and stack?')">
+      <span class="mnav-icon">🔧</span>stack
+    </button>
+    <button class="mnav-btn" onclick="handleCommand('/contact')">
+      <span class="mnav-icon">📡</span>contact
+    </button>
+    <button class="mnav-btn" onclick="handleCommand('/download')">
+      <span class="mnav-icon">📄</span>resume
+    </button>
+  </div>
+
   <!-- CRASH OVERLAY -->
   <div id="crash-overlay">
     <canvas id="crash-canvas"></canvas>
@@ -455,9 +612,19 @@
       </div>
       <div class="crash-contact-box">
         <div class="cc-label">// Direct Contact</div>
-        <div class="cc-row"><span>email</span> <a href="mailto:casulwendell12@gmail.com">casulwendell12@gmail.com</a></div>
-        <div class="cc-row"><span>phone</span> +63 966 771 6434</div>
-        <div class="cc-row"><span>location</span> Cebu City, PH — open to international</div>
+        <div class="cc-row">
+          <span>email</span>
+          <a href="mailto:casulwendell12@gmail.com?subject=Hi%20Wendell%20%E2%80%94%20I%20found%20your%20AI%20portfolio&body=Hi%20Wendell%2C%0A%0AI%20came%20across%20your%20interactive%20AI%20portfolio%20and%20wanted%20to%20reach%20out.%0A%0A">
+            casulwendell12@gmail.com ↗
+          </a>
+        </div>
+        <div class="cc-row">
+          <span>phone</span>
+          <a href="tel:+639667716434">+63 966 771 6434 ↗</a>
+        </div>
+        <div class="cc-row">
+          <span>location</span> Cebu City, PH — open to international
+        </div>
       </div>
       <button id="crash-restart" onclick="restartFromCrash()">↺ Reboot System</button>
       <div id="crash-counter"></div>
@@ -617,7 +784,7 @@
     const input   = document.getElementById('input');
     const sendBtn = document.getElementById('send-btn');
 
-    function appendMessage(role, text) {
+    async function appendMessage(role, text) {
       const wrap = document.createElement('div');
       wrap.className = 'msg-wrap';
       const meta = document.createElement('div');
@@ -639,23 +806,90 @@
         wrap.appendChild(meta); wrap.appendChild(body);
 
       } else {
-        // AI message — inline icons injected directly into text
+        // AI message — typewriter effect then inline icons + project cards
         meta.innerHTML = `<span class="tag tag-ai">WENDELL</span><span>${timeStr}</span>`;
         const body = document.createElement('div');
         body.className = 'msg-body';
-        body.innerHTML = injectInlineIcons(text);
+        body.innerHTML = '';
         wrap.appendChild(meta);
         wrap.appendChild(body);
+        output.appendChild(wrap);
+        output.scrollTop = output.scrollHeight;
 
-        // Inject project cards if any projects are mentioned
-        const mentionedProjects = detectProjects(text);
-        const cards = renderProjectCards(mentionedProjects);
-        if (cards) wrap.appendChild(cards);
+        // Typewriter: stream characters one by one
+        await typewriterEffect(body, text, () => {
+          // After typing finishes — inject project cards
+          const mentionedProjects = detectProjects(text);
+          const cards = renderProjectCards(mentionedProjects);
+          if (cards) wrap.appendChild(cards);
+          output.scrollTop = output.scrollHeight;
+        });
+
+        return wrap;
       }
 
       output.appendChild(wrap);
       output.scrollTop = output.scrollHeight;
       return wrap;
+    }
+
+    // Typewriter: types out HTML content character by character
+    function typewriterEffect(el, text, onDone) {
+      return new Promise(resolve => {
+        const html = injectInlineIcons(text);
+        // To typewrite HTML safely, render to temp div and walk text nodes
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        // Flatten to array of {type:'text'|'node', content} chunks
+        const chunks = [];
+        temp.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            chunks.push({ type: 'text', content: node.textContent });
+          } else {
+            chunks.push({ type: 'node', content: node.cloneNode(true) });
+          }
+        });
+
+        let chunkIdx = 0;
+        let charIdx  = 0;
+        let currentTextNode = null;
+        const SPEED = 8; // ms per character
+
+        function tick() {
+          if (chunkIdx >= chunks.length) {
+            if (onDone) onDone();
+            resolve();
+            return;
+          }
+          const chunk = chunks[chunkIdx];
+          if (chunk.type === 'node') {
+            // Inject the whole node (icon span, strong, em, code) at once
+            el.appendChild(chunk.content);
+            currentTextNode = null;
+            chunkIdx++;
+            output.scrollTop = output.scrollHeight;
+            setTimeout(tick, SPEED);
+          } else {
+            // Type text character by character
+            if (charIdx === 0) {
+              currentTextNode = document.createTextNode('');
+              el.appendChild(currentTextNode);
+            }
+            if (charIdx < chunk.content.length) {
+              currentTextNode.textContent += chunk.content[charIdx];
+              charIdx++;
+              output.scrollTop = output.scrollHeight;
+              setTimeout(tick, SPEED);
+            } else {
+              charIdx = 0;
+              chunkIdx++;
+              setTimeout(tick, SPEED);
+            }
+          }
+        }
+        tick();
+      });
     }
 
     function appendLoading() {
@@ -693,8 +927,9 @@
 
         if (data.content && data.content[0]) {
           const aiText = data.content[0].text;
-          appendMessage('ai', aiText);
+          await appendMessage('ai', aiText);
           conversationHistory.push({ role: 'assistant', content: aiText });
+          updateContextPrompts(aiText);
           questionCount++;
           if (!crashed && questionCount >= CRASH_THRESHOLD) { setTimeout(triggerCrash, 600); }
         } else {
@@ -829,19 +1064,44 @@
       '/help': () => {
         appendMessage('system', [
           '> Available commands:',
-          '  /clear   — clear chat and reset conversation history',
-          '  /reset   — same as /clear',
-          '  /stack   — show full tech stack',
+          '  /clear    — clear chat and reset history',
+          '  /reset    — same as /clear',
+          '  /stack    — show full tech stack',
           '  /contact  — show contact details',
           '  /hi       — say hello to Wendell',
+          '  /projects — show all project cards',
           '  /download — download resume as PDF',
+          '  /whoami   — identify yourself',
           '  /help     — show this help menu',
+          '  ',
+          '  /share     — copy shareable portfolio link',
+          '  /theme     — toggle phosphor green theme',
+          '  /linkedin  — generate LinkedIn post copy',
+          '  /qr        — show QR code for this portfolio',
+          '  /ask [x]   — ask Wendell to write code for x',
+          '  ',
+          '  🥚 there may be other commands worth discovering...',
         ].join('\n'));
       },
       '/reset':   () => COMMANDS['/clear'](),
       '/stack':   () => sendMessage('List every technology and tool in your stack in detail.', true),
       '/contact': () => sendMessage('How can I contact you? Give me all your contact details.', true),
       '/hi':      () => sendMessage('Hey Wendell!', true),
+      '/projects': () => {
+        appendMessage('system', '> Loading project cards...');
+        const cards = renderProjectCards(PROJECTS);
+        if (cards) {
+          const wrap = document.createElement('div');
+          wrap.className = 'msg-wrap';
+          const meta = document.createElement('div');
+          meta.className = 'msg-meta';
+          meta.innerHTML = `<span class="tag tag-ai">WENDELL</span>`;
+          wrap.appendChild(meta);
+          wrap.appendChild(cards);
+          output.appendChild(wrap);
+          output.scrollTop = output.scrollHeight;
+        }
+      },
       '/download': () => {
         appendMessage('system', '> Downloading resume...\n> File: Wendell_Casul_Resume.pdf');
         const a = document.createElement('a');
@@ -849,17 +1109,125 @@
         a.download = 'Wendell_Casul_Resume.pdf';
         a.click();
       },
+      '/sudo': () => {
+        appendMessage('system', [
+          '> sudo: Permission denied.',
+          '> Nice try. Wendell is not in the sudoers file.',
+          '> This incident will be reported. 😄',
+        ].join('\n'));
+      },
+      '/coffee': () => {
+        appendMessage('system', [
+          '> ☕ Brewing coffee...',
+          '> ERROR: No coffee machine found on localhost.',
+          '> Try: casulwendell12@gmail.com — he runs on coffee and LLMs.',
+        ].join('\n'));
+      },
+      '/hire': () => {
+        appendMessage('system', [
+          '> 🎯 Excellent choice.',
+          '> Initiating hire sequence...',
+          '> Step 1: Email casulwendell12@gmail.com',
+          '> Step 2: Say "I found your AI portfolio"',
+          '> Step 3: ???',
+          '> Step 4: Best hire you ever made. ✅',
+        ].join('\n'));
+      },
+      '/matrix': () => {
+        document.body.style.transition = 'filter 0.5s';
+        document.body.style.filter = 'hue-rotate(120deg) saturate(2)';
+        appendMessage('system', '> Wake up, Wendell... 🐇\n> The Matrix has you.\n> (type /clear to escape)');
+        setTimeout(() => { document.body.style.filter = ''; }, 5000);
+      },
+      '/whoami': () => {
+        appendMessage('system', [
+          '> whoami',
+          '> wendell — AI Engineer / Full-Stack Developer',
+          '> uid=1337(wendell) gid=1337(builders)',
+          '> groups=ai,fullstack,cebu,open-to-work',
+        ].join('\n'));
+      },
+      '/theme': () => {
+        const isPhosphor = document.body.classList.toggle('theme-phosphor');
+        appendMessage('system', isPhosphor
+          ? '> ⚗️  Theme: PHOSPHOR GREEN activated.\n> Classic CRT vibes. Type /theme to switch back.'
+          : '> 🌑 Theme: DARK restored.');
+      },
+      '/linkedin': () => {
+        const url = window.location.href;
+        const post = `🤖 I built an AI portfolio that literally talks back.\n\nInstead of a static page listing my skills, visitors can ask me anything — projects, stack, experience, what I'm looking for.\n\nBuilt with Node.js, Gemini AI, and a terminal-style UI. It even crashes dramatically after too many questions. 😄\n\nTech: React · PHP · Laravel · Docker · AWS · LLM Integration\n\nCheck it out 👇\n${url}\n\n#AIEngineer #FullStack #Portfolio #WebDev #OpenToWork`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(post).then(() => {
+            appendMessage('system', '> ✅ LinkedIn post copied to clipboard!\n> Head to LinkedIn → paste → post.\n> Tip: add 1-2 relevant hashtags for your target industry.');
+          });
+        }
+      },
+      '/qr': () => {
+        const url = encodeURIComponent(window.location.href);
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${url}&bgcolor=080b10&color=00f5d4&margin=10`;
+        const wrap = document.createElement('div');
+        wrap.className = 'msg-wrap';
+        const meta = document.createElement('div');
+        meta.className = 'msg-meta';
+        meta.innerHTML = `<span class="tag tag-sys">SYS</span>`;
+        const body = document.createElement('div');
+        body.className = 'msg-body sys-body';
+        body.textContent = '> QR code generated — scan to share your portfolio:';
+        const img = document.createElement('img');
+        img.src = qrUrl;
+        img.style.cssText = 'display:block;margin-top:10px;border:1px solid #1c2333;border-radius:4px;width:160px;height:160px;';
+        img.alt = 'Portfolio QR Code';
+        const hint = document.createElement('div');
+        hint.style.cssText = 'font-size:9px;color:#3a4556;margin-top:6px;letter-spacing:0.1em;';
+        hint.textContent = '> right-click → save image → print on business card';
+        wrap.appendChild(meta);
+        wrap.appendChild(body);
+        wrap.appendChild(img);
+        wrap.appendChild(hint);
+        output.appendChild(wrap);
+        output.scrollTop = output.scrollHeight;
+      },
+      '/ask': (args) => {
+        const topic = args || 'a hello world program';
+        sendMessage(`Write a short, clean code example for: ${topic}. Keep it concise — under 20 lines. Add a brief comment explaining what it does.`, true);
+      },
+      '/share': () => {
+        const url  = window.location.href;
+        const text = `🤖 Check out this AI portfolio — you can literally talk to the dev.\n${url}`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => {
+            appendMessage('system', [
+              '> ✅ Copied to clipboard!',
+              '> Message: "🤖 Check out this AI portfolio — you can literally talk to the dev."',
+              `> URL: ${url}`,
+              '> Paste it anywhere — LinkedIn, Slack, Discord, iMessage.',
+            ].join('\n'));
+          }).catch(() => {
+            appendMessage('system', `> Share this link:\n> ${url}`);
+          });
+        } else {
+          appendMessage('system', `> Share this link:\n> ${url}`);
+        }
+      },
     };
+
+    // Used by mobile nav buttons to trigger commands directly
+    function handleCommand(cmd) {
+      appendMessage('user', cmd);
+      if (COMMANDS[cmd]) { COMMANDS[cmd](); return; }
+    }
 
     function handleSend() {
       const val = input.value.trim();
       if (!val) return;
       input.value = '';
 
-      const cmd = val.toLowerCase();
+      const parts  = val.split(' ');
+      const cmd    = parts[0].toLowerCase();
+      const args   = parts.slice(1).join(' ');
       if (COMMANDS[cmd]) {
         appendMessage('user', val);
-        COMMANDS[cmd]();
+        COMMANDS[cmd](args);
         return;
       }
 
@@ -881,6 +1249,78 @@
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
     });
+
+    // ── Visitor counter ───────────────────────────────────
+    // ── Context-aware prompts ─────────────────────────────
+    const CONTEXT_PROMPTS = [
+      { keys: ['laravel','cakephp','slim','php'],  label: '🔴 more on Laravel',    q: 'Tell me more about your Laravel and PHP work in detail.' },
+      { keys: ['react','typescript','frontend'],    label: '⚛️ more on React',      q: 'Tell me more about your React and TypeScript experience.' },
+      { keys: ['docker','aws','devops','deploy'],   label: '🐳 more on DevOps',     q: 'Tell me more about your Docker and AWS deployment experience.' },
+      { keys: ['lulu','nativecamp','maids'],        label: '🚀 project details',    q: 'Tell me more technical details about that project.' },
+      { keys: ['llm','ai','claude','gemini','gpt'], label: '🤖 more on AI work',    q: 'Tell me more about your AI and LLM integration experience.' },
+      { keys: ['sdd','speckit','cursor'],           label: '📐 more on SDD',        q: 'Explain Spec-Driven Development and how you use it day to day.' },
+      { keys: ['hire','opportunity','open','role'], label: '📡 contact Wendell',    q: 'How can I contact you or start a conversation about working together?' },
+    ];
+
+    function updateContextPrompts(aiText) {
+      const lower = aiText.toLowerCase();
+      const matched = CONTEXT_PROMPTS.filter(p => p.keys.some(k => lower.includes(k)));
+      if (!matched.length) return;
+
+      const wrap = document.getElementById('quick-wrap');
+      const label = document.getElementById('quick-label');
+
+      // Remove old context buttons
+      wrap.querySelectorAll('.qbtn-context').forEach(b => b.remove());
+
+      // Add matched context buttons
+      label.textContent = 'Suggested →';
+      matched.slice(0, 3).forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'qbtn qbtn-context';
+        btn.style.cssText = 'color:var(--cyan);border-color:rgba(0,245,212,0.4);background:rgba(0,245,212,0.05);';
+        btn.textContent = p.label;
+        btn.onclick = () => sendQuick(p.q);
+        wrap.appendChild(btn);
+      });
+
+      // Fade back to default after 30s
+      setTimeout(() => {
+        wrap.querySelectorAll('.qbtn-context').forEach(b => b.remove());
+        label.textContent = 'Quick Prompts →';
+      }, 30000);
+    }
+
+    // ── Skill bar animation ────────────────────────────────
+    function animateSkillBars() {
+      document.querySelectorAll('.skill-bar').forEach(bar => {
+        const target = bar.style.width || bar.getAttribute('data-width') || '0%';
+        bar.style.setProperty('--target-width', target);
+        bar.style.width = '0%';
+        // Trigger reflow then animate
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => { bar.classList.add('animated'); });
+        });
+      });
+    }
+
+    // ── Input bar focus glow ───────────────────────────────
+    function initInputGlow() {
+      const bar   = document.getElementById('input-bar');
+      const input = document.getElementById('input');
+      input.addEventListener('focus', () => bar.classList.add('focused'));
+      input.addEventListener('blur',  () => bar.classList.remove('focused'));
+    }
+
+    async function loadVisitorCount() {
+      try {
+        const res = await fetch('/api/visitors');
+        const data = await res.json();
+        const badge = document.getElementById('visitor-badge');
+        badge.textContent = `⬤ ${data.today} visitor${data.today === 1 ? '' : 's'} today`;
+        badge.classList.add('loaded');
+      } catch {}
+    }
 
     function boot() {
       const lines = [
