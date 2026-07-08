@@ -130,7 +130,7 @@ async function callAI(systemPrompt, messages) {
 }
 
 // ── API Route ─────────────────────────────────────────────
-app.post('/api/chat', rateLimit, async (req, res) => {
+app.post('/api/chat', requireAccess, rateLimit, async (req, res) => {
   const { messages } = req.body;
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Invalid messages format.' });
@@ -200,6 +200,110 @@ app.get('/api/visitors', (req, res) => {
   const ip    = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
   const stats = recordVisit(ip);
   res.json(stats);
+});
+
+// ── Share tokens — one-time trackable referral codes ──────
+// Persisted to tokens.json. Each token maps a short code (e.g. "A7K2")
+// to an optional label, plus how many times its link was opened.
+const TOKENS_FILE = path.join(__dirname, 'tokens.json');
+
+function loadTokens() {
+  try {
+    if (fs.existsSync(TOKENS_FILE)) {
+      return JSON.parse(fs.readFileSync(TOKENS_FILE, 'utf-8'));
+    }
+  } catch {}
+  return { tokens: {} };
+}
+
+function saveTokens(data) {
+  try { fs.writeFileSync(TOKENS_FILE, JSON.stringify(data, null, 2)); } catch {}
+}
+
+// Keep codes safe: uppercase alphanumerics only, max 12 chars.
+function cleanCode(raw) {
+  return String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+}
+
+// ── Access control ────────────────────────────────────────
+// OWNER_PASSCODE (from .env) is your master key: it unlocks the site
+// and authorizes owner-only actions (generating/listing invites).
+// Each invite (ref) also carries its own passcode for visitors.
+
+// Owner-only guard — used for creating and listing invites.
+function requireOwner(req, res, next) {
+  const ownerPass = process.env.OWNER_PASSCODE;
+  const given = req.headers['x-owner-pass'];
+  if (ownerPass && given && given === ownerPass) return next();
+  return res.status(403).json({ error: 'Owner access required.' });
+}
+
+// Access guard for the paid AI — allows the owner OR a valid ref+passcode.
+// This is the real protection: no valid passcode ⇒ no LLM call ⇒ no spend.
+function requireAccess(req, res, next) {
+  const ownerPass  = process.env.OWNER_PASSCODE;
+  const givenOwner = req.headers['x-owner-pass'];
+  if (ownerPass && givenOwner && givenOwner === ownerPass) return next();
+
+  const ref      = cleanCode(req.headers['x-ref']);
+  const passcode = String(req.headers['x-passcode'] || '');
+  if (ref && passcode) {
+    const t = loadTokens().tokens[ref];
+    if (t && t.passcode && t.passcode === passcode) return next();
+  }
+  return res.status(401).json({ error: 'Access denied — a valid invite passcode is required.' });
+}
+
+// The access wall calls this to validate a passcode at the door.
+// A correct ref+passcode also counts as an "open" for that invite.
+app.post('/api/access', (req, res) => {
+  const passcode  = String(req.body?.passcode || '');
+  const ownerPass = process.env.OWNER_PASSCODE;
+  if (ownerPass && passcode && passcode === ownerPass) {
+    return res.json({ ok: true, owner: true });
+  }
+
+  const code = cleanCode(req.body?.code);
+  if (code && passcode) {
+    const data = loadTokens();
+    const t = data.tokens[code];
+    if (t && t.passcode && t.passcode === passcode) {
+      t.opens++;
+      t.lastOpened = new Date().toISOString();
+      data.tokens[code] = t;
+      saveTokens(data);
+      return res.json({ ok: true, owner: false, label: t.label });
+    }
+  }
+  return res.status(401).json({ ok: false, error: 'Invalid passcode.' });
+});
+
+// Register a freshly generated invite: code + passcode + optional label. Owner only.
+app.post('/api/token/create', requireOwner, (req, res) => {
+  const code     = cleanCode(req.body?.code);
+  const label    = String(req.body?.label || '').trim().slice(0, 60);
+  const passcode = String(req.body?.passcode || '').trim().slice(0, 32);
+  if (!code)     return res.status(400).json({ error: 'Invalid code.' });
+  if (!passcode) return res.status(400).json({ error: 'A passcode is required.' });
+
+  const data = loadTokens();
+  if (!data.tokens[code]) {
+    data.tokens[code] = { label, passcode, created: new Date().toISOString(), opens: 0, lastOpened: null };
+  } else {
+    if (label) data.tokens[code].label = label;
+    data.tokens[code].passcode = passcode;
+  }
+  saveTokens(data);
+  res.json({ ok: true, code, label: data.tokens[code].label, passcode });
+});
+
+// List all invites (with passcodes + open counts), most-recent first. Owner only.
+app.get('/api/token/list', requireOwner, (req, res) => {
+  const data = loadTokens();
+  const list = Object.entries(data.tokens)
+    .map(([code, t]) => ({ code, ...t }))
+    .sort((a, b) => (b.lastOpened || '').localeCompare(a.lastOpened || '') || b.opens - a.opens);
+  res.json({ tokens: list });
 });
 
 // ── Status route — see which provider is active ───────────

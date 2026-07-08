@@ -500,9 +500,63 @@
       }
       body.pre-crash { animation: warningFlash 0.3s ease 3; }
 
+      /* ─── ACCESS WALL ─────────────────────────────────── */
+      #access-overlay {
+        position: fixed; inset: 0; z-index: 2000;
+        background: var(--bg);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--mono);
+      }
+      #access-box {
+        width: min(90vw, 380px);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 6px;
+        padding: 32px 28px;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(0,245,212,0.08);
+        animation: fadeSlide 0.3s ease;
+      }
+      #access-title {
+        color: var(--cyan); font-size: 14px; font-weight: 700;
+        letter-spacing: 0.14em; margin-bottom: 14px;
+        text-shadow: 0 0 12px rgba(0,245,212,0.4);
+      }
+      #access-sub { color: var(--dim); font-size: 11px; line-height: 1.7; margin-bottom: 18px; }
+      #access-ref { color: var(--amber); font-size: 11px; margin-bottom: 14px; letter-spacing: 0.1em; min-height: 14px; }
+      #access-input {
+        width: 100%; background: var(--bg); border: 1px solid var(--border);
+        color: var(--amber); font-family: var(--mono); font-size: 14px;
+        padding: 10px 12px; border-radius: 3px; outline: none; text-align: center;
+        letter-spacing: 0.2em; margin-bottom: 12px;
+      }
+      #access-input:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,245,212,0.25); }
+      #access-btn {
+        width: 100%; font-family: var(--mono); font-size: 12px; font-weight: 700;
+        color: var(--bg); background: var(--cyan); border: none; padding: 10px;
+        border-radius: 3px; cursor: pointer; letter-spacing: 0.1em; transition: opacity 0.15s;
+      }
+      #access-btn:hover { opacity: 0.85; }
+      #access-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      #access-error { color: #ff4c6a; font-size: 10px; margin-top: 12px; min-height: 12px; letter-spacing: 0.06em; }
+      #access-hint { color: var(--muted); font-size: 9px; margin-top: 16px; letter-spacing: 0.08em; }
+
     </style>
   </head>
   <body>
+
+  <!-- ACCESS WALL — covers everything until a valid passcode is entered -->
+  <div id="access-overlay">
+    <div id="access-box">
+      <div id="access-title">🔒 ACCESS REQUIRED</div>
+      <div id="access-sub">This portfolio is invite-only.<br/>Enter the passcode from your invite.</div>
+      <div id="access-ref"></div>
+      <input id="access-input" type="password" placeholder="passcode" autocomplete="off" spellcheck="false" />
+      <button id="access-btn">UNLOCK ↵</button>
+      <div id="access-error"></div>
+      <div id="access-hint">No invite? Reach out: casulwendell12@gmail.com</div>
+    </div>
+  </div>
 
   <div id="topbar">
     <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
@@ -919,7 +973,7 @@
       try {
         const response = await fetch('/api/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...accessHeaders() },
           body: JSON.stringify({ messages: conversationHistory }),
         });
         const data = await response.json();
@@ -1079,6 +1133,8 @@
           '  /linkedin  — generate LinkedIn post copy',
           '  /qr        — show QR code for this portfolio',
           '  /ask [x]   — ask Wendell to write code for x',
+          '  /token [w] — [owner] create an invite link + passcode (e.g. /token acme)',
+          '  /opens     — [owner] see invites, passcodes, and open counts',
           '  ',
           '  🥚 there may be other commands worth discovering...',
         ].join('\n'));
@@ -1209,7 +1265,153 @@
           appendMessage('system', `> Share this link:\n> ${url}`);
         }
       },
+      '/token': async (args) => {
+        const label    = (args || '').trim();
+        const code     = genRefCode();
+        const passcode = genPasscode();
+        const url      = `${window.location.origin}/?ref=${code}`;
+
+        // Register the invite (owner-only endpoint).
+        try {
+          const res = await fetch('/api/token/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...accessHeaders() },
+            body: JSON.stringify({ code, label, passcode }),
+          });
+          if (res.status === 403) {
+            appendMessage('system', '> ⛔ /token is owner-only. Unlock with your OWNER passcode to generate invites.');
+            return;
+          }
+          if (!res.ok) { appendMessage('system', '> Could not create invite — is the server running?'); return; }
+        } catch {
+          appendMessage('system', '> Could not create invite — is the server running?');
+          return;
+        }
+
+        if (navigator.clipboard) {
+          try { await navigator.clipboard.writeText(`${url}\nPasscode: ${passcode}`); } catch {}
+        }
+
+        appendMessage('system', [
+          '> 🔗 Invite created' + (label ? ` for "${label}"` : '') + ':',
+          `> Link:     ${url}`,
+          `> Passcode: ${passcode}`,
+          '> ✅ Link + passcode copied to clipboard.',
+          '> Send BOTH to your recipient — they enter the passcode to get in.',
+          '> Run /opens to see who has opened their invite.',
+        ].join('\n'));
+      },
+      '/opens': async () => {
+        appendMessage('system', '> Fetching invite activity...');
+        try {
+          const res = await fetch('/api/token/list', { headers: { ...accessHeaders() } });
+          if (res.status === 403) {
+            appendMessage('system', '> ⛔ /opens is owner-only. Unlock with your OWNER passcode.');
+            return;
+          }
+          const data = await res.json();
+          const list = data.tokens || [];
+          if (!list.length) {
+            appendMessage('system', '> No invites yet. Generate one with /token [label].');
+            return;
+          }
+          const lines = ['> Invite activity (most recent first):', '>'];
+          list.forEach(t => {
+            const who  = t.label ? t.label : '(no label)';
+            const last = t.lastOpened
+              ? new Date(t.lastOpened).toLocaleString()
+              : 'never opened';
+            lines.push(`>  ${t.code.padEnd(6)} · pass:${String(t.passcode || '—').padEnd(8)} · ${String(t.opens).padStart(3)} opens · ${who} · ${last}`);
+          });
+          appendMessage('system', lines.join('\n'));
+        } catch {
+          appendMessage('system', '> Could not load activity — is the server running?');
+        }
+      },
     };
+
+    // Short, unambiguous referral code (no 0/O/1/I to avoid confusion).
+    function genRefCode(len = 4) {
+      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s = '';
+      for (let i = 0; i < len; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+      return s;
+    }
+
+    // A visitor passcode — a bit longer, easy to read aloud.
+    function genPasscode(len = 6) {
+      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s = '';
+      for (let i = 0; i < len; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+      return s;
+    }
+
+    // Auth headers sent with protected requests, derived from the unlocked session.
+    function accessHeaders() {
+      const raw = sessionStorage.getItem('access');
+      if (!raw) return {};
+      try {
+        const a = JSON.parse(raw);
+        if (a.owner) return { 'x-owner-pass': a.passcode };
+        return { 'x-ref': a.ref, 'x-passcode': a.passcode };
+      } catch { return {}; }
+    }
+
+    // Access wall: validate a passcode before revealing the site + starting the AI.
+    function initAccess() {
+      const overlay = document.getElementById('access-overlay');
+      const params  = new URLSearchParams(window.location.search);
+      const ref     = (params.get('ref') || '').toUpperCase();
+
+      // Already unlocked this browser session? Skip the wall.
+      if (sessionStorage.getItem('access')) {
+        overlay.style.display = 'none';
+        boot();
+        return;
+      }
+
+      const refEl   = document.getElementById('access-ref');
+      const inputEl = document.getElementById('access-input');
+      const btnEl   = document.getElementById('access-btn');
+      const errEl   = document.getElementById('access-error');
+      if (ref) refEl.textContent = `Invite: ${ref}`;
+
+      async function attempt() {
+        const passcode = inputEl.value.trim();
+        if (!passcode) return;
+        btnEl.disabled = true;
+        errEl.textContent = '';
+        try {
+          const res = await fetch('/api/access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: ref, passcode }),
+          });
+          const data = await res.json();
+          if (res.ok && data.ok) {
+            const access = data.owner ? { owner: true, passcode } : { ref, passcode };
+            sessionStorage.setItem('access', JSON.stringify(access));
+            // Strip ?ref= so the visitor can't re-share your invite as their own.
+            params.delete('ref');
+            history.replaceState({}, '', window.location.pathname + (params.toString() ? `?${params}` : ''));
+            overlay.style.display = 'none';
+            boot();
+          } else {
+            errEl.textContent = data.error || 'Invalid passcode.';
+            inputEl.value = '';
+            btnEl.disabled = false;
+            inputEl.focus();
+          }
+        } catch {
+          errEl.textContent = 'Server unreachable — is it running?';
+          btnEl.disabled = false;
+        }
+      }
+
+      btnEl.addEventListener('click', attempt);
+      inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+      inputEl.focus();
+    }
 
     // Used by mobile nav buttons to trigger commands directly
     function handleCommand(cmd) {
@@ -1337,7 +1539,7 @@
       nextLine();
     }
 
-    boot();
+    initAccess();
   </script>
   </body>
 </html>
