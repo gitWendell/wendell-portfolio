@@ -17,6 +17,25 @@ const OLLAMA_MODEL  = process.env.OLLAMA_MODEL || 'llama3.1';
 const USE_OLLAMA    = process.env.USE_OLLAMA !== 'false'; // default ON
 const MAX_RETRIES   = 5;
 
+// ── Keep-alive ────────────────────────────────────────────
+// Render's free tier spins a service down after 15 min without inbound
+// HTTP traffic, so we ping our own *public* URL — a localhost request
+// never reaches Render's proxy and wouldn't count as traffic.
+// RENDER_EXTERNAL_URL is injected by Render automatically.
+const KEEP_ALIVE_URL      = process.env.KEEP_ALIVE_URL || process.env.RENDER_EXTERNAL_URL || '';
+const KEEP_ALIVE          = process.env.KEEP_ALIVE !== 'false' && !!KEEP_ALIVE_URL;
+const KEEP_ALIVE_INTERVAL = Number(process.env.KEEP_ALIVE_MINUTES || 14) * 60 * 1000;
+
+// Tried in order; a rate-limited model is skipped for the next one.
+const GEMINI_MODELS = (process.env.GEMINI_MODELS || 'gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash')
+  .split(',').map(m => m.trim()).filter(Boolean);
+
+// Last resort when every Gemini model is capped. Any OpenAI-compatible
+// chat API works here — Groq, OpenRouter, Together, OpenAI itself.
+const FALLBACK_URL   = process.env.FALLBACK_API_URL || '';
+const FALLBACK_KEY   = process.env.FALLBACK_API_KEY || '';
+const FALLBACK_MODEL = process.env.FALLBACK_MODEL || '';
+
 // ── Middleware ────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
@@ -78,10 +97,23 @@ async function callOllama(systemPrompt, messages) {
   return data.message?.content || '';
 }
 
-// ── Gemini call with retry (fallback) ─────────────────────
-async function callGeminiWithRetry(systemPrompt, messages) {
-  if (!gemini) throw new Error('Gemini API key not configured.');
+// Quota/rate-limit exhaustion — retrying the same model won't help,
+// so we move on to the next one instead of backing off.
+function isRateLimited(err) {
+  const msg = err?.message || '';
+  return msg.includes('429')
+    || msg.includes('RESOURCE_EXHAUSTED')
+    || /quota|rate limit/i.test(msg);
+}
 
+// Overloaded upstream — worth a backoff retry on the same model.
+function isOverloaded(err) {
+  const msg = err?.message || '';
+  return msg.includes('503') || msg.includes('UNAVAILABLE');
+}
+
+// ── Gemini call: one model, with retry on 503 ─────────────
+async function callGeminiModel(model, systemPrompt, messages) {
   const history = messages.slice(0, -1).map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }],
@@ -92,7 +124,7 @@ async function callGeminiWithRetry(systemPrompt, messages) {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const chat = gemini.chats.create({
-        model: 'gemini-2.5-flash',
+        model,
         config: { systemInstruction: systemPrompt },
         history,
       });
@@ -100,17 +132,44 @@ async function callGeminiWithRetry(systemPrompt, messages) {
       return response.text;
     } catch (err) {
       lastError = err;
-      const is503 = err.message?.includes('503') || err.message?.includes('UNAVAILABLE');
-      if (!is503 || attempt === MAX_RETRIES) break;
+      if (!isOverloaded(err) || attempt === MAX_RETRIES) break;
       const delay = Math.pow(2, attempt) * 500;
-      console.warn(`⚠️  Gemini attempt ${attempt}/${MAX_RETRIES} failed. Retrying in ${delay}ms...`);
+      console.warn(`⚠️  ${model} attempt ${attempt}/${MAX_RETRIES} failed. Retrying in ${delay}ms...`);
       await new Promise(r => setTimeout(r, delay));
     }
   }
   throw lastError;
 }
 
-// ── Main AI router: Ollama → Gemini fallback ──────────────
+// ── OpenAI-compatible call (final fallback) ───────────────
+async function callFallbackProvider(systemPrompt, messages) {
+  const response = await fetch(`${FALLBACK_URL.replace(/\/$/, '')}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${FALLBACK_KEY}`,
+    },
+    body: JSON.stringify({
+      model: FALLBACK_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+      ],
+    }),
+    signal: AbortSignal.timeout(60000),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Fallback provider error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// ── Main AI router ────────────────────────────────────────
+// Ollama → each Gemini model in turn → OpenAI-compatible provider.
 async function callAI(systemPrompt, messages) {
   if (USE_OLLAMA) {
     try {
@@ -124,9 +183,36 @@ async function callAI(systemPrompt, messages) {
     }
   }
 
-  const text = await callGeminiWithRetry(systemPrompt, messages);
-  console.log('✅ Gemini responded.');
-  return { text, provider: 'gemini' };
+  let lastError = new Error('No AI provider is configured.');
+
+  if (gemini) {
+    for (const model of GEMINI_MODELS) {
+      try {
+        const text = await callGeminiModel(model, systemPrompt, messages);
+        console.log(`✅ Gemini responded (${model}).`);
+        return { text, provider: `gemini:${model}` };
+      } catch (err) {
+        lastError = err;
+        if (isRateLimited(err)) {
+          console.warn(`⚠️  ${model} is rate-limited. Trying the next model...`);
+          continue;
+        }
+        console.warn(`⚠️  ${model} failed: ${err.message}`);
+        break; // Not a quota problem — another Gemini model won't fix it.
+      }
+    }
+  } else {
+    lastError = new Error('Gemini API key not configured.');
+  }
+
+  if (FALLBACK_URL && FALLBACK_KEY && FALLBACK_MODEL) {
+    console.warn(`↩️  Falling back to ${FALLBACK_MODEL}...`);
+    const text = await callFallbackProvider(systemPrompt, messages);
+    console.log(`✅ Fallback provider responded (${FALLBACK_MODEL}).`);
+    return { text, provider: `fallback:${FALLBACK_MODEL}` };
+  }
+
+  throw lastError;
 }
 
 // ── API Route ─────────────────────────────────────────────
@@ -314,11 +400,21 @@ app.get('/api/status', async (req, res) => {
     ollamaOnline = r.ok;
   } catch {}
 
+  const fallbackConfigured = !!(FALLBACK_URL && FALLBACK_KEY && FALLBACK_MODEL);
+
   res.json({
-    ollama: { online: ollamaOnline, model: OLLAMA_MODEL, url: OLLAMA_URL },
-    gemini: { configured: !!process.env.GEMINI_API_KEY },
-    active: ollamaOnline && USE_OLLAMA ? 'ollama' : 'gemini',
+    ollama:   { online: ollamaOnline, model: OLLAMA_MODEL, url: OLLAMA_URL },
+    gemini:   { configured: !!gemini, models: GEMINI_MODELS },
+    fallback: { configured: fallbackConfigured, model: FALLBACK_MODEL || null },
+    active: ollamaOnline && USE_OLLAMA ? 'ollama' : gemini ? 'gemini' : fallbackConfigured ? 'fallback' : 'none',
   });
+});
+
+// ── Health check — the keep-alive ping target ─────────────
+// Deliberately cheap: no disk reads, no upstream calls. Must stay
+// above the catch-all, or it would just serve index.html instead.
+app.get('/healthz', (req, res) => {
+  res.json({ ok: true, uptime: Math.round(process.uptime()) });
 });
 
 // ── Catch-all ─────────────────────────────────────────────
@@ -326,9 +422,29 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Keep-alive loop ───────────────────────────────────────
+// Only useful while the process is alive: it prevents the spin-down,
+// but can't wake a service that has already gone to sleep.
+function startKeepAlive() {
+  const target = `${KEEP_ALIVE_URL.replace(/\/$/, '')}/healthz`;
+
+  setInterval(async () => {
+    try {
+      const r = await fetch(target, { signal: AbortSignal.timeout(30000) });
+      if (!r.ok) console.warn(`⚠️  Keep-alive ping got ${r.status}`);
+    } catch (err) {
+      console.warn(`⚠️  Keep-alive ping failed: ${err.message}`);
+    }
+  }, KEEP_ALIVE_INTERVAL).unref(); // Don't hold the event loop open on shutdown.
+
+  console.log(`💓  Keep-alive → ${target} every ${KEEP_ALIVE_INTERVAL / 60000} min`);
+}
+
 app.listen(PORT, async () => {
   console.log(`\n✅  Wendell's portfolio running at http://localhost:${PORT}`);
   console.log(`📝  System prompt: prompt.txt`);
+
+  if (KEEP_ALIVE) startKeepAlive();
 
   // Check Ollama on startup
   try {
