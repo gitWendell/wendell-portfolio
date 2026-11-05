@@ -1,12 +1,13 @@
 {
   "name": "wendell-portfolio",
   "version": "1.0.0",
-  "description": "Wendell B. Casul — Interactive AI Portfolio",
+  "description": "Wendell B. Casul \u2014 Interactive AI Portfolio",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=18.0.0"

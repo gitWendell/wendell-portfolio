@@ -1,168 +1,42 @@
-# 🚀 Wendell Portfolio — Deploy Guide
+# Wendell portfolio
 
-Your portfolio is a Node.js app with two parts:
+This app uses Node.js and Express. The public homepage works without an AI provider. The optional AI guide uses the existing invite and owner access checks.
 
-- **`server.js`** — Express backend that holds your API key and proxies requests to Anthropic
-- **`public/index.html`** — The terminal UI that talks to _your_ server (not Anthropic directly)
+## Run locally
 
----
-
-## Step 1 — Get Your Anthropic API Key
-
-1. Go to → https://console.anthropic.com
-2. Sign up / log in
-3. Click **API Keys** in the left sidebar
-4. Click **Create Key** → copy it (starts with `sk-ant-...`)
-
-> ⚠️ Keep this secret. Never paste it into public code or commit it to GitHub.
-
----
-
-## Step 2 — Test Locally First
-
-```bash
-# 1. Enter the project folder
-cd wendell-portfolio
-
-# 2. Install dependencies
-npm install
-
-# 3. Create your .env file from the example
-cp .env.example .env
-
-# 4. Open .env and paste your real API key
-#    ANTHROPIC_API_KEY=sk-ant-YOUR-REAL-KEY-HERE
-
-# 5. Start the server
-npm start
-
-# 6. Open your browser at:
-#    http://localhost:3000
+```sh
+npm ci
+PORT=3020 USE_OLLAMA=false KEEP_ALIVE=false npm start
 ```
 
-If it works locally — the chat responds — you're ready to deploy.
+Open http://localhost:3020. No API key is needed to review the homepage or invite screen. Configure an AI provider and an owner passcode in the server environment only when testing the guide with access.
 
----
-
-## Option A — Deploy to Render (Recommended, Free Tier Available)
-
-### 1. Push to GitHub
-
-```bash
-# Inside wendell-portfolio/
-git init
-git add .
-git commit -m "initial portfolio"
-
-# Create a repo on github.com then:
-git remote add origin https://github.com/YOUR_USERNAME/wendell-portfolio.git
-git push -u origin main
+```sh
+npm test
 ```
 
-### 2. Create a Web Service on Render
+The tests start an isolated local server and check the public homepage, static assets, script syntax, and access restrictions. They do not make AI calls.
 
-1. Go to → https://render.com and sign up (free)
-2. Click **New → Web Service**
-3. Connect your GitHub account → select `wendell-portfolio`
-4. Fill in these settings:
+## Files
 
-| Setting           | Value         |
-| ----------------- | ------------- |
-| **Name**          | ` s`          |
-| **Environment**   | `Node`        |
-| **Build Command** | `npm install` |
-| **Start Command** | `npm start`   |
-| **Instance Type** | Free          |
+- `public/index.html`, `home.css`, `home.js`: public professional overview, services, selected work, contact links, and invite-link forwarding.
+- `public/explore.html`: existing terminal-style AI guide with its invite screen.
+- `public/social-card.png`: local image for social sharing previews.
+- `server.js`: static hosting, AI proxy, existing access checks, and invite management.
+- `prompt.txt`: professional background, services, remote-work preferences, and truthful boundaries for learning tools.
 
-5. Scroll down to **Environment Variables** → click **Add Variable**:
-   - Key: `ANTHROPIC_API_KEY`
-   - Value: `sk-ant-YOUR-REAL-KEY-HERE`
+Old links such as `/?ref=ABCD` still open the homepage and offer a link to the guide carrying that invite code. New guide invites point directly to `/explore.html?ref=ABCD`.
 
-6. Click **Create Web Service**
+## Update the existing host
 
-Render will build and deploy. In ~2 minutes you'll get a live URL like:
-`https://wendell-portfolio.onrender.com`
+Keep the existing domain, hosting service, and production secrets. This change does not need a new host or a new paid service.
 
-> 💡 **Free tier note:** Render free services sleep after 15 min of inactivity. The first visit after sleep takes ~30 seconds to wake up. Upgrade to Starter ($7/mo) for always-on.
+1. Push the reviewed changes to the repository branch connected to the current host.
+2. Use `npm ci` as the install/build command and `npm start` as the start command. The host supplies `PORT`.
+3. Keep the existing `OWNER_PASSCODE`, provider configuration, and persistent `tokens.json` / `visitors.json` data. Do not put their values in Git.
+4. Open the homepage and confirm the introduction, services, work examples, and email links.
+5. Open `/explore.html` and confirm it still asks for an invite passcode.
 
----
+The public homepage does not grant access to `/api/chat` or owner invite tools. Existing AI settings support Ollama, Gemini via `GEMINI_API_KEY`, and an optional OpenAI-compatible fallback. Keep provider keys on the server. `USE_OLLAMA=false` skips the Ollama call during chat when the host does not run it.
 
-## Option B — Deploy to Railway
-
-1. Go to → https://railway.app and sign up
-2. Click **New Project → Deploy from GitHub repo**
-3. Select `wendell-portfolio`
-4. Railway auto-detects Node.js — no config needed
-5. Go to **Variables** tab → add:
-   - `ANTHROPIC_API_KEY` = `sk-ant-YOUR-KEY`
-6. Click **Deploy** → done
-
-Railway gives you a URL like `https://wendell-portfolio.up.railway.app`
-
-> Railway has a $5/mo free credit — plenty for a portfolio site.
-
----
-
-## Option C — Deploy to Vercel (Requires minor refactor)
-
-Vercel works best with serverless functions. The current setup is a standard Express server, so Render or Railway are easier. If you want Vercel specifically, ask Wendell to refactor to `/api/chat.js` serverless style.
-
----
-
-## Custom Domain (Optional)
-
-Once deployed on Render or Railway:
-
-1. Buy a domain (Namecheap, GoDaddy, etc.) — e.g. `wendellcasul.dev`
-2. In Render: **Settings → Custom Domains → Add Domain**
-3. Point your domain's DNS to Render's provided CNAME
-4. Done — your portfolio lives at `https://wendellcasul.dev`
-
----
-
-## Project Structure
-
-```
-wendell-portfolio/
-├── server.js          ← Node/Express backend (holds API key)
-├── package.json       ← Dependencies + start script
-├── .env.example       ← Template for your secrets
-├── .env               ← Your real secrets (never commit this!)
-├── .gitignore         ← Ignores node_modules and .env
-└── public/
-    └── index.html     ← Your portfolio UI
-```
-
----
-
-## How It Works (Architecture)
-
-```
-Visitor's Browser
-      │
-      │  POST /api/chat   (no API key exposed)
-      ▼
-Your Server (Render/Railway)
-      │
-      │  POST api.anthropic.com/v1/messages
-      │  Authorization: Bearer sk-ant-...  ← key stays here
-      ▼
-Anthropic Claude API
-      │
-      └─ Response flows back to browser
-```
-
-Your API key **never touches the browser**. Visitors can't see it in DevTools or page source.
-
----
-
-## Estimated Monthly Cost
-
-| Service        | Cost                         |
-| -------------- | ---------------------------- |
-| Render Free    | $0 (sleeps after inactivity) |
-| Render Starter | ~$7/mo (always-on)           |
-| Railway        | ~$0–5/mo (free credit)       |
-| Anthropic API  | ~$0.01–0.10 per conversation |
-
-A portfolio with moderate traffic costs practically nothing.
+The server uses Node's built-in `fetch`; it no longer relies on `node-fetch` being installed indirectly by another dependency.

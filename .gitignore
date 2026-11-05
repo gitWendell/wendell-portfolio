@@ -5,3 +5,5 @@ node_modules/
 
 visitors.json
 tokens.json
+
+outputs/
